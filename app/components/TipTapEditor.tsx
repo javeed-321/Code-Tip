@@ -295,11 +295,326 @@
 //     </div>
 //   );
 // }
+// "use client";
+
+// import "katex/dist/katex.min.css";
+
+// import { useState, useRef, useEffect } from "react";
+// import { EditorContent, useEditor } from "@tiptap/react";
+// import StarterKit from "@tiptap/starter-kit";
+// import { Markdown } from "@tiptap/markdown";
+// import { Details, DetailsContent, DetailsSummary } from "@tiptap/extension-details";
+// import { Highlight } from "@tiptap/extension-highlight";
+// import { Image } from "@tiptap/extension-image";
+// import { TaskItem, TaskList } from "@tiptap/extension-list";
+// import { Mathematics } from "@tiptap/extension-mathematics";
+// import { Mention } from "@tiptap/extension-mention";
+// import { TableKit } from "@tiptap/extension-table";
+// import { Twitch } from "@tiptap/extension-twitch";
+// import { Youtube } from "@tiptap/extension-youtube";
+
+// import CodeMirror, { type ReactCodeMirrorRef } from "@uiw/react-codemirror";
+// import { markdown as cmMarkdown } from "@codemirror/lang-markdown";
+// import { history, historyKeymap } from "@codemirror/commands";
+// import { EditorView, keymap } from "@codemirror/view";
+// import { Prec } from "@codemirror/state";
+
+// import { Bold, Italic, Type, Link as LinkIcon, List, ListOrdered } from "lucide-react";
+
+// import { mdContent } from "./content";
+// import { styles } from "./styles";
+
+// /* ---------- CodeMirror helpers (toolbar actions) ---------- */
+
+// function toggleWrap(view: EditorView, delim: string) {
+//   const { state } = view;
+//   const { from, to } = state.selection.main;
+//   const d = delim.length;
+//   const selected = state.sliceDoc(from, to);
+//   const before = state.sliceDoc(Math.max(0, from - d), from);
+//   const after = state.sliceDoc(to, Math.min(state.doc.length, to + d));
+
+//   if (from === to) {
+//     // Empty selection: do nothing
+//   } else if (
+//     selected.startsWith(delim) &&
+//     selected.endsWith(delim) &&
+//     selected.length >= d * 2
+//   ) {
+//     const inner = selected.slice(d, -d);
+//     view.dispatch({
+//       changes: { from, to, insert: inner },
+//       selection: { anchor: from, head: from + inner.length },
+//     });
+//   } else if (before === delim && after === delim) {
+//     view.dispatch({
+//       changes: { from: from - d, to: to + d, insert: selected },
+//       selection: { anchor: from - d, head: from - d + selected.length },
+//     });
+//   } else {
+//     view.dispatch({
+//       changes: { from, to, insert: delim + selected + delim },
+//       selection: { anchor: from + d, head: from + d + selected.length },
+//     });
+//   }
+//   view.focus();
+// }
+
+// function toggleBulletList(view: EditorView) {
+//   const { state } = view;
+//   const { from, to } = state.selection.main;
+
+//   const startLine = state.doc.lineAt(from);
+//   const endLine = state.doc.lineAt(to);
+
+//   const lines: string[] = [];
+//   for (let n = startLine.number; n <= endLine.number; n++) {
+//     lines.push(state.doc.line(n).text);
+//   }
+
+//   const allBulleted = lines.every((line) => line.startsWith("- "));
+//   const newLines = lines.map((line) => {
+//     const stripped = line.replace(/^(- |\d+\.\s)/, "");
+//     return allBulleted ? stripped : `- ${stripped}`;
+//   });
+
+//   const newText = newLines.join("\n");
+//   view.dispatch({
+//     changes: { from: startLine.from, to: endLine.to, insert: newText },
+//     selection: { anchor: startLine.from + newText.length },
+//   });
+//   view.focus();
+// }
+
+// function toggleOrderedList(view: EditorView) {
+//   const { state } = view;
+//   const { from, to } = state.selection.main;
+
+//   const startLine = state.doc.lineAt(from);
+//   const endLine = state.doc.lineAt(to);
+
+//   const lines: string[] = [];
+//   for (let n = startLine.number; n <= endLine.number; n++) {
+//     lines.push(state.doc.line(n).text);
+//   }
+
+//   const allOrdered = lines.every((line) => /^\d+\.\s/.test(line));
+//   const newLines = lines.map((line, i) => {
+//     const stripped = line.replace(/^(- |\d+\.\s)/, "");
+//     return allOrdered ? stripped : `${i + 1}. ${stripped}`;
+//   });
+
+//   const newText = newLines.join("\n");
+//   view.dispatch({
+//     changes: { from: startLine.from, to: endLine.to, insert: newText },
+//     selection: { anchor: startLine.from + newText.length },
+//   });
+//   view.focus();
+// }
+
+// function cycleHeading(view: EditorView) {
+//   // Paragraph -> H1 -> H2 -> H3 -> Paragraph
+//   const { state } = view;
+//   const line = state.doc.lineAt(state.selection.main.from);
+//   const m = line.text.match(/^(#{1,6})\s+/);
+//   const current = m ? m[1].length : 0;
+//   const next = current >= 3 ? 0 : current + 1;
+//   const body = m ? line.text.slice(m[0].length) : line.text;
+//   const replaced = next === 0 ? body : "#".repeat(next) + " " + body;
+//   view.dispatch({ changes: { from: line.from, to: line.to, insert: replaced } });
+//   view.focus();
+// }
+
+// function insertLink(view: EditorView) {
+//   const url = window.prompt("URL:", "https://");
+//   if (!url) return;
+//   const { state } = view;
+//   const { from, to } = state.selection.main;
+//   const text = state.sliceDoc(from, to) || "link";
+//   view.dispatch({ changes: { from, to, insert: `[${text}](${url})` } });
+//   view.focus();
+// }
+
+// /* ---------- Enter-key handler: continue or exit a list ---------- */
+
+// const continueList = (view: EditorView): boolean => {
+//   const { state } = view;
+//   const { from, to } = state.selection.main;
+//   if (from !== to) return false;
+
+//   const line = state.doc.lineAt(from);
+
+//   // Bullet list (-, *, +)
+//   const bullet = line.text.match(/^(\s*)([-*+])\s+(.*)$/);
+//   if (bullet) {
+//     const [, indent, marker, content] = bullet;
+//     if (content.trim() === "") {
+//       // Empty item -> exit the list
+//       view.dispatch({
+//         changes: { from: line.from, to: line.to, insert: "" },
+//         selection: { anchor: line.from },
+//       });
+//       return true;
+//     }
+//     const insert = `\n${indent}${marker} `;
+//     view.dispatch({
+//       changes: { from, to, insert },
+//       selection: { anchor: from + insert.length },
+//     });
+//     return true;
+//   }
+
+//   // Ordered list (1. 2. 3. ...)
+//   const ordered = line.text.match(/^(\s*)(\d+)\.\s+(.*)$/);
+//   if (ordered) {
+//     const [, indent, numStr, content] = ordered;
+//     if (content.trim() === "") {
+//       view.dispatch({
+//         changes: { from: line.from, to: line.to, insert: "" },
+//         selection: { anchor: line.from },
+//       });
+//       return true;
+//     }
+//     const next = parseInt(numStr, 10) + 1;
+//     const insert = `\n${indent}${next}. `;
+//     view.dispatch({
+//       changes: { from, to, insert },
+//       selection: { anchor: from + insert.length },
+//     });
+//     return true;
+//   }
+
+//   // Not on a list line — let CodeMirror handle Enter normally
+//   return false;
+// };
+
+// const listContinuation = Prec.highest(
+//   keymap.of([{ key: "Enter", run: continueList }])
+// );
+
+// /* ---------- CodeMirror theme: padding around the editor ---------- */
+
+// const editorPadding = EditorView.theme({
+//   "&": { padding: "16px", margin: "3px !important" },
+// });
+
+// /* ---------- Component ---------- */
+
+// export default function MarkdownEditor() {
+//   const [text, setText] = useState(mdContent);
+//   const editorRef = useRef<ReactCodeMirrorRef>(null);
+
+//   const editor = useEditor({
+//     extensions: [
+//       Markdown,
+//       StarterKit,
+//       Details, DetailsSummary, DetailsContent,
+//       TaskList, TaskItem.configure({ nested: true }),
+//       Youtube.configure({ inline: false, width: 480, height: 320 }),
+//       Twitch.configure({
+//         inline: false,
+//         width: 480,
+//         height: 320,
+//         parent: typeof window !== "undefined" ? window.location.hostname : "localhost",
+//       }),
+//       Image,
+//       TableKit,
+//       Highlight,
+//       Mention,
+//       Mathematics,
+//     ],
+//     content: "",
+//     contentType: "markdown",
+//     editable: false,
+//     immediatelyRender: false,
+//   });
+
+//   // Debounced auto-parse: CodeMirror text -> Tiptap preview
+//   useEffect(() => {
+//     if (!editor) return;
+//     const id = setTimeout(() => {
+//       try {
+//         editor.commands.setContent(text, { contentType: "markdown" });
+//       } catch {
+//         /* ignore parse errors */
+//       }
+//     }, 250);
+//     return () => clearTimeout(id);
+//   }, [text, editor]);
+
+//   // Toolbar helper — fetch the live view and run the action
+//   const cmd = (fn: (v: EditorView) => void) => () => {
+//     const v = editorRef.current?.view;
+//     if (v) fn(v);
+//   };
+
+//   return (
+//     <div className="md-demo">
+//       <style>{styles}</style>
+
+//       <div className="toolbar">
+//         <button onClick={cmd((v) => toggleWrap(v, "**"))} title="Bold">
+//           <Bold className="size-4" />
+//         </button>
+//         <button onClick={cmd((v) => toggleWrap(v, "*"))} title="Italic">
+//           <Italic className="size-4" />
+//         </button>
+//         <button onClick={cmd(cycleHeading)} title="Heading">
+//           <Type className="size-4" />
+//         </button>
+//         <button onClick={cmd(insertLink)} title="Link">
+//           <LinkIcon className="size-4" />
+//         </button>
+//         <button onClick={cmd(toggleBulletList)} title="Bullet list">
+//           <List className="size-4" />
+//         </button>
+//         <button onClick={cmd(toggleOrderedList)} title="Ordered list">
+//           <ListOrdered className="size-4" />
+//         </button>
+//       </div>
+
+//       <div className="split">
+//         <div className="pane">
+//           <div className="label">Markdown</div>
+//           <div className="editor-box" style={{ padding: 0 }}>
+//             <CodeMirror
+//               ref={editorRef}
+//               value={text}
+//               height="100%"
+//               basicSetup={{
+//                 lineNumbers: false,
+//                 foldGutter: false,
+//               }}
+//               extensions={[
+//                 cmMarkdown(),
+//                 history(),
+//                 editorPadding,
+//                 listContinuation,
+//                 keymap.of(historyKeymap),
+//               ]}
+//               onChange={setText}
+//             />
+//           </div>
+//         </div>
+
+//         <div className="pane">
+//           <div className="label">Preview</div>
+//           <div className="editor-box tiptap-output">
+//             {editor && <EditorContent editor={editor} />}
+//           </div>
+//         </div>
+//       </div>
+//     </div>
+//   );
+// }
 "use client";
 
 import "katex/dist/katex.min.css";
+import "@toast-ui/editor/dist/toastui-editor.css";
 
 import { useState, useRef, useEffect } from "react";
+
+// Tiptap
 import { EditorContent, useEditor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import { Markdown } from "@tiptap/markdown";
@@ -313,90 +628,18 @@ import { TableKit } from "@tiptap/extension-table";
 import { Twitch } from "@tiptap/extension-twitch";
 import { Youtube } from "@tiptap/extension-youtube";
 
-import CodeMirror, { type ReactCodeMirrorRef } from "@uiw/react-codemirror";
-import { markdown as cmMarkdown } from "@codemirror/lang-markdown";
-import { history, historyKeymap } from "@codemirror/commands";
-import { keymap, type EditorView } from "@codemirror/view";
+// TOAST UI Editor
+import { Editor } from "@toast-ui/react-editor";
 
-import { Bold, Italic, Type, Link as LinkIcon } from "lucide-react";
 import { mdContent } from "./content";
-
-/* ---------- Three tiny CodeMirror helpers ---------- */
-
-function toggleWrap(view: EditorView, delim: string) {
-  const { state } = view;
-  const { from, to } = state.selection.main;
-  const d = delim.length;
-  const selected = state.sliceDoc(from, to);
-  const before = state.sliceDoc(Math.max(0, from - d), from);
-  const after = state.sliceDoc(to, Math.min(state.doc.length, to + d));
-
-  if (from === to) {
-    // Empty selection: insert wrappers, cursor between
-    view.dispatch({
-      changes: { from, to, insert: delim + delim },
-      selection: { anchor: from + d },
-    });
-  } else if (
-    selected.startsWith(delim) &&
-    selected.endsWith(delim) &&
-    selected.length >= d * 2
-  ) {
-    // Selection includes the delims -> strip
-    const inner = selected.slice(d, -d);
-    view.dispatch({
-      changes: { from, to, insert: inner },
-      selection: { anchor: from, head: from + inner.length },
-    });
-  } else if (before === delim && after === delim) {
-    // Delims sit just outside selection -> strip
-    view.dispatch({
-      changes: { from: from - d, to: to + d, insert: selected },
-      selection: { anchor: from - d, head: from - d + selected.length },
-    });
-  } else {
-    // Otherwise wrap
-    view.dispatch({
-      changes: { from, to, insert: delim + selected + delim },
-      selection: { anchor: from + d, head: from + d + selected.length },
-    });
-  }
-  view.focus();
-}
-
-function cycleHeading(view: EditorView) {
-  // Paragraph -> H1 -> H2 -> H3 -> Paragraph
-  const { state } = view;
-  const line = state.doc.lineAt(state.selection.main.from);
-  const m = line.text.match(/^(#{1,6})\s+/);
-  const current = m ? m[1].length : 0;
-  const next = current >= 3 ? 0 : current + 1;
-  const body = m ? line.text.slice(m[0].length) : line.text;
-  const replaced = next === 0 ? body : "#".repeat(next) + " " + body;
-  view.dispatch({ changes: { from: line.from, to: line.to, insert: replaced } });
-  view.focus();
-}
-
-function insertLink(view: EditorView) {
-  const url = window.prompt("URL:", "https://");
-  if (!url) return;
-  const { state } = view;
-  const { from, to } = state.selection.main;
-  const text = state.sliceDoc(from, to) || "link";
-  view.dispatch({ changes: { from, to, insert: `[${text}](${url})` } });
-  view.focus();
-}
-
-/* ---------- Styles ---------- */
-
 import { styles } from "./styles";
-
-/* ---------- Component ---------- */
 
 export default function MarkdownEditor() {
   const [text, setText] = useState(mdContent);
-  const editorRef = useRef<ReactCodeMirrorRef>(null);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const tuiRef = useRef<any>(null);
 
+  // Tiptap (preview only — editable false)
   const editor = useEditor({
     extensions: [
       Markdown,
@@ -405,7 +648,9 @@ export default function MarkdownEditor() {
       TaskList, TaskItem.configure({ nested: true }),
       Youtube.configure({ inline: false, width: 480, height: 320 }),
       Twitch.configure({
-        inline: false, width: 480, height: 320,
+        inline: false,
+        width: 480,
+        height: 320,
         parent: typeof window !== "undefined" ? window.location.hostname : "localhost",
       }),
       Image,
@@ -420,58 +665,48 @@ export default function MarkdownEditor() {
     immediatelyRender: false,
   });
 
-  // Debounced auto-parse left -> right
+  // Debounced sync: TOAST UI text -> Tiptap preview
   useEffect(() => {
     if (!editor) return;
     const id = setTimeout(() => {
       try {
         editor.commands.setContent(text, { contentType: "markdown" });
       } catch {
-        /* ignore parse errors */
+        /* ignore */
       }
-    }, 250);
+    }, 150);
     return () => clearTimeout(id);
   }, [text, editor]);
 
-  // Button helper
-  const cmd = (fn: (v: EditorView) => void) => () => {
-    const v = editorRef.current?.view;
-    if (v) fn(v);
+  // Pull current markdown out of TOAST UI on every change
+  const handleChange = () => {
+    const md = tuiRef.current?.getInstance()?.getMarkdown() ?? "";
+    setText(md);
   };
 
   return (
     <div className="md-demo">
       <style>{styles}</style>
 
-      <div className="toolbar">
-        <button onClick={cmd((v) => toggleWrap(v, "**"))} title="Bold">
-          <Bold className="size-4" />
-        </button>
-        <button onClick={cmd((v) => toggleWrap(v, "*"))} title="Italic">
-          <Italic className="size-4" />
-        </button>
-        <button onClick={cmd(cycleHeading)} title="Heading">
-          <Type className="size-4" />
-        </button>
-        <button onClick={cmd(insertLink)} title="Link">
-          <LinkIcon className="size-4" />
-        </button>
-      </div>
-
       <div className="split">
+        {/* Left — TOAST UI editor */}
         <div className="pane">
           <div className="label">Markdown</div>
-          <div className="editor-box" style={{ padding: 0 }}>
-            <CodeMirror
-              ref={editorRef}
-              value={text}
+          <div className="editor-box" style={{ padding: 0, overflow: "hidden" }}>
+            <Editor
+              ref={tuiRef}
+              initialValue={text}
+              previewStyle="tab"
               height="100%"
-              extensions={[cmMarkdown(), history(), keymap.of(historyKeymap)]}
-              onChange={setText}
+              initialEditType="markdown"
+              useCommandShortcut={true}
+              hideModeSwitch={true}
+              onChange={handleChange}
             />
           </div>
         </div>
 
+        {/* Right — Tiptap rendered output */}
         <div className="pane">
           <div className="label">Preview</div>
           <div className="editor-box tiptap-output">

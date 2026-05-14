@@ -15,7 +15,9 @@ export const styles = `
 .md-demo .error {
   background: #fee2e2; border: 1px solid #fecaca; color: #dc2626; padding: 8px 12px; border-radius: 6px; font-size: 14px;
 }
-
+.md-demo .pane .toastui-editor-md-tab-container {
+  display: none;
+}
 /* Editor content styling */
 .tiptap-output .ProseMirror { outline: none; min-height: 100%; }
 .tiptap-output h1 { font-size: 1.8rem; font-weight: 700; margin: 0.6em 0 0.3em; }
@@ -76,4 +78,12 @@ export const styles = `
 
 /* Highlight */
 .tiptap-output mark { background: #fef08a; padding: 0 2px; border-radius: 2px; }
+
+.toastui-editor-md-preview {
+  display: none !important;
+}
+.toastui-editor-md-container .toastui-editor-md-splitter {
+  display: none !important;
+}
+  
 `;

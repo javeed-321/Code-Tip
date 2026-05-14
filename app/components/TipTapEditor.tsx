@@ -315,267 +315,167 @@ import { Youtube } from "@tiptap/extension-youtube";
 
 import CodeMirror, { type ReactCodeMirrorRef } from "@uiw/react-codemirror";
 import { markdown as cmMarkdown } from "@codemirror/lang-markdown";
-import { history, historyKeymap, undo, redo } from "@codemirror/commands";
-import { keymap } from "@codemirror/view";
+import { history, historyKeymap } from "@codemirror/commands";
+import { keymap, type EditorView } from "@codemirror/view";
 
+import { Bold, Italic, Type, Link as LinkIcon } from "lucide-react";
 import { mdContent } from "./content";
-import {
-  Heading1, Heading2, Heading3,
-  Bold, Italic, Strikethrough, Highlighter,
-  AlignLeft, AlignCenter, AlignRight,
-  List, ListOrdered,
-} from "lucide-react";
 
+/* ---------- Three tiny CodeMirror helpers ---------- */
 
+function toggleWrap(view: EditorView, delim: string) {
+  const { state } = view;
+  const { from, to } = state.selection.main;
+  const d = delim.length;
+  const selected = state.sliceDoc(from, to);
+  const before = state.sliceDoc(Math.max(0, from - d), from);
+  const after = state.sliceDoc(to, Math.min(state.doc.length, to + d));
 
-
-
-
-
-// ---------- Styles ----------
-const styles = `
-.md-demo { display: flex; flex-direction: column; height: calc(100vh - 32px); font-family: sans-serif; padding: 16px; gap: 12px; }
-.md-demo .toolbar { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
-.md-demo .toolbar button {
-  padding: 6px 12px; border: 1px solid #d1d5db; background: #fff; border-radius: 6px; cursor: pointer; font-size: 14px;
-}
-.md-demo .toolbar button:hover { background: #f9fafb; }
-.md-demo .toolbar button:disabled { opacity: 0.5; cursor: not-allowed; }
-.md-demo .split { display: flex; flex: 1; gap: 16px; overflow: hidden; }
-.md-demo .pane { flex: 1; display: flex; flex-direction: column; gap: 8px; min-width: 0; }
-.md-demo .label { font-weight: 600; font-size: 14px; color: #374151; }
-.md-demo .editor-box {
-  flex: 1; border: 1px solid #e5e7eb; border-radius: 6px; padding: 12px; overflow: auto; background: #fff;
-}
-.md-demo .error {
-  background: #fee2e2; border: 1px solid #fecaca; color: #dc2626; padding: 8px 12px; border-radius: 6px; font-size: 14px;
-}
-
-/* Editor content styling */
-.tiptap-output .ProseMirror { outline: none; min-height: 100%; }
-.tiptap-output h1 { font-size: 1.8rem; font-weight: 700; margin: 0.6em 0 0.3em; }
-.tiptap-output h2 { font-size: 1.4rem; font-weight: 700; margin: 0.6em 0 0.3em; }
-.tiptap-output h3 { font-size: 1.15rem; font-weight: 600; margin: 0.5em 0 0.3em; }
-.tiptap-output p { margin: 0.5em 0; line-height: 1.6; }
-.tiptap-output ul, .tiptap-output ol { padding-left: 1.5em; margin: 0.5em 0; }
-.tiptap-output ul { list-style: disc; }
-.tiptap-output ol { list-style: decimal; }
-.tiptap-output strong { font-weight: 700; }
-.tiptap-output em { font-style: italic; }
-.tiptap-output a { color: #2563eb; text-decoration: underline; }
-.tiptap-output blockquote {
-  border-left: 3px solid #d1d5db; margin: 0.5em 0; padding: 0.2em 0.8em; color: #4b5563;
-}
-.tiptap-output code {
-  background: #f3f4f6; padding: 2px 5px; border-radius: 3px;
-  font-family: ui-monospace, Menlo, monospace; font-size: 0.9em;
-}
-.tiptap-output pre {
-  background: #1f2937; color: #f3f4f6;
-  padding: 12px; border-radius: 6px; overflow-x: auto; margin: 0.8em 0;
-}
-.tiptap-output pre code { background: transparent; color: inherit; padding: 0; }
-.tiptap-output img { max-width: 100%; border-radius: 4px; margin: 0.5em 0; }
-
-/* Task list */
-.tiptap-output ul[data-type="taskList"] { list-style: none; padding-left: 0; }
-.tiptap-output ul[data-type="taskList"] li { display: flex; align-items: flex-start; gap: 8px; }
-.tiptap-output ul[data-type="taskList"] li > label { flex-shrink: 0; margin-top: 4px; }
-.tiptap-output ul[data-type="taskList"] li > div { flex: 1; }
-
-/* Table */
-.tiptap-output table { border-collapse: collapse; width: 100%; margin: 0.5em 0; }
-.tiptap-output table td, .tiptap-output table th { border: 1px solid #d1d5db; padding: 6px 10px; }
-.tiptap-output table th { background: #f9fafb; font-weight: 600; }
-
-/* Mention */
-.tiptap-output .mention {
-  background: #e0e7ff; color: #3730a3; padding: 2px 6px;
-  border-radius: 4px; font-weight: 500;
+  if (from === to) {
+    // Empty selection: insert wrappers, cursor between
+    view.dispatch({
+      changes: { from, to, insert: delim + delim },
+      selection: { anchor: from + d },
+    });
+  } else if (
+    selected.startsWith(delim) &&
+    selected.endsWith(delim) &&
+    selected.length >= d * 2
+  ) {
+    // Selection includes the delims -> strip
+    const inner = selected.slice(d, -d);
+    view.dispatch({
+      changes: { from, to, insert: inner },
+      selection: { anchor: from, head: from + inner.length },
+    });
+  } else if (before === delim && after === delim) {
+    // Delims sit just outside selection -> strip
+    view.dispatch({
+      changes: { from: from - d, to: to + d, insert: selected },
+      selection: { anchor: from - d, head: from - d + selected.length },
+    });
+  } else {
+    // Otherwise wrap
+    view.dispatch({
+      changes: { from, to, insert: delim + selected + delim },
+      selection: { anchor: from + d, head: from + d + selected.length },
+    });
+  }
+  view.focus();
 }
 
-/* Math */
-.tiptap-output [data-type="block-math"] {
-  margin: 1rem 0; padding: 0.5rem; background: #f8fafc; border-radius: 4px; text-align: center;
+function cycleHeading(view: EditorView) {
+  // Paragraph -> H1 -> H2 -> H3 -> Paragraph
+  const { state } = view;
+  const line = state.doc.lineAt(state.selection.main.from);
+  const m = line.text.match(/^(#{1,6})\s+/);
+  const current = m ? m[1].length : 0;
+  const next = current >= 3 ? 0 : current + 1;
+  const body = m ? line.text.slice(m[0].length) : line.text;
+  const replaced = next === 0 ? body : "#".repeat(next) + " " + body;
+  view.dispatch({ changes: { from: line.from, to: line.to, insert: replaced } });
+  view.focus();
 }
-.tiptap-output [data-type="inline-math"] {
-  background: #f1f5f9; padding: 2px 4px; border-radius: 3px;
+
+function insertLink(view: EditorView) {
+  const url = window.prompt("URL:", "https://");
+  if (!url) return;
+  const { state } = view;
+  const { from, to } = state.selection.main;
+  const text = state.sliceDoc(from, to) || "link";
+  view.dispatch({ changes: { from, to, insert: `[${text}](${url})` } });
+  view.focus();
 }
 
-/* Iframe (YouTube/Twitch) */
-.tiptap-output iframe { max-width: 100%; border: none; border-radius: 6px; margin: 0.5em 0; }
+/* ---------- Styles ---------- */
 
-/* Details */
-.tiptap-output details { margin: 0.5em 0; padding: 8px 12px; border: 1px solid #e5e7eb; border-radius: 6px; }
-.tiptap-output details summary { cursor: pointer; font-weight: 600; }
+import { styles } from "./styles";
 
-/* Highlight */
-.tiptap-output mark { background: #fef08a; padding: 0 2px; border-radius: 2px; }
-`;
+/* ---------- Component ---------- */
 
-// ---------- Component ----------
 export default function MarkdownEditor() {
-  const [markdownInput, setMarkdownInput] = useState(mdContent);
-  const [error, setError] = useState<string | null>(null);
+  const [text, setText] = useState(mdContent);
   const editorRef = useRef<ReactCodeMirrorRef>(null);
-const [, forceRender] = useState(0);
+
   const editor = useEditor({
     extensions: [
       Markdown,
       StarterKit,
-      Details,
-      DetailsSummary,
-      DetailsContent,
-      TaskList,
-      TaskItem.configure({ nested: true }),
+      Details, DetailsSummary, DetailsContent,
+      TaskList, TaskItem.configure({ nested: true }),
       Youtube.configure({ inline: false, width: 480, height: 320 }),
       Twitch.configure({
-        inline: false,
-        width: 480,
-        height: 320,
+        inline: false, width: 480, height: 320,
         parent: typeof window !== "undefined" ? window.location.hostname : "localhost",
       }),
       Image,
       TableKit,
       Highlight,
-      Mention.configure({
-        HTMLAttributes: { class: "mention" },
-        suggestions: [
-          {
-            char: "@",
-            items: ({ query }: { query: string }) =>
-              [
-                "Lea Thompson", "Cyndi Lauper", "Tom Cruise", "Madonna",
-                "Jerry Hall", "Joan Collins", "Winona Ryder", "Christina Applegate",
-              ]
-                .filter((i) => i.toLowerCase().startsWith(query.toLowerCase()))
-                .slice(0, 5),
-          },
-          {
-            char: "#",
-            items: ({ query }: { query: string }) =>
-              [
-                "bug", "feature", "enhancement", "documentation",
-                "help-wanted", "priority-high", "priority-low",
-              ]
-                .filter((i) => i.toLowerCase().startsWith(query.toLowerCase()))
-                .slice(0, 5),
-          },
-        ],
-      } as any),
+      Mention,
       Mathematics,
     ],
-    content: '# Markdown Test\n\nClick **"Parse Markdown"** to load content from the left panel.',
+    content: "",
     contentType: "markdown",
     editable: false,
-    immediatelyRender: true,
+    immediatelyRender: false,
   });
 
-  const parseMarkdown = () => {
-    if (!editor) {
-      setError("Editor not ready");
-      return;
-    }
-    try {
-      setError(null);
-      editor.commands.setContent(markdownInput, { contentType: "markdown" });
-    } catch (err) {
-      setError(`Error parsing markdown: ${err instanceof Error ? err.message : String(err)}`);
-    }
-  };
-
-  const extractMarkdown = () => {
+  // Debounced auto-parse left -> right
+  useEffect(() => {
     if (!editor) return;
-    try {
-      const md = editor.getMarkdown();
-      setMarkdownInput(md);
-    } catch {
-      setMarkdownInput(editor.getText());
-    }
+    const id = setTimeout(() => {
+      try {
+        editor.commands.setContent(text, { contentType: "markdown" });
+      } catch {
+        /* ignore parse errors */
+      }
+    }, 250);
+    return () => clearTimeout(id);
+  }, [text, editor]);
+
+  // Button helper
+  const cmd = (fn: (v: EditorView) => void) => () => {
+    const v = editorRef.current?.view;
+    if (v) fn(v);
   };
-
-const wrap = (delim: string) => {
-  const view = editorRef.current?.view;
-  if (view) toggleWrap(view, delim);
-};
-
-useEffect(() => {
-  if (!editor) return;
-
-  const timeoutId = setTimeout(() => {
-    try {
-      setError(null);
-      editor.commands.setContent(markdownInput, { contentType: "markdown" });
-    } catch (err) {
-      setError(`Error parsing markdown: ${err instanceof Error ? err.message : String(err)}`);
-    }
-  }, 100);
-
-  return () => clearTimeout(timeoutId);
-}, [markdownInput, editor]);
-
-
-//   useEffect(() => {
-//     parseMarkdown();
-//   }, [markdownInput, editor]);
-const view = editorRef.current?.view;
-const state = view?.state;
-
-const run = (fn: (v: any) => void) => () => { if (view) fn(view); };
-
-const Options = state ? [
-  { icon: <Heading1 className="size-4" />,    onClick: run(v => toggleHeading(v, 1)), pressed: isHeadingActive(state, 1) },
-  { icon: <Heading2 className="size-4" />,    onClick: run(v => toggleHeading(v, 2)), pressed: isHeadingActive(state, 2) },
-  { icon: <Heading3 className="size-4" />,    onClick: run(v => toggleHeading(v, 3)), pressed: isHeadingActive(state, 3) },
-  { icon: <Bold className="size-4" />,        onClick: run(v => toggleWrap(v, "**")),  pressed: isWrapActive(state, "**") },
-  { icon: <Italic className="size-4" />,      onClick: run(v => toggleWrap(v, "*")),   pressed: isWrapActive(state, "*") },
-  { icon: <Strikethrough className="size-4"/>,onClick: run(v => toggleWrap(v, "~~")),  pressed: isWrapActive(state, "~~") },
-  { icon: <AlignLeft className="size-4" />,   onClick: run(v => setAlignment(v, "left")),   pressed: isAlignActive(state, "left") },
-  { icon: <AlignCenter className="size-4" />, onClick: run(v => setAlignment(v, "center")), pressed: isAlignActive(state, "center") },
-  { icon: <AlignRight className="size-4" />,  onClick: run(v => setAlignment(v, "right")),  pressed: isAlignActive(state, "right") },
-  { icon: <List className="size-4" />,        onClick: run(toggleBulletList),  pressed: isBulletActive(state) },
-  { icon: <ListOrdered className="size-4" />, onClick: run(toggleOrderedList), pressed: isOrderedActive(state) },
-  { icon: <Highlighter className="size-4" />, onClick: run(v => toggleWrap(v, "==")), pressed: isWrapActive(state, "==") },
-] : [];
 
   return (
     <div className="md-demo">
       <style>{styles}</style>
 
       <div className="toolbar">
-        <button onClick={parseMarkdown} disabled={!editor || !markdownInput.trim()}>
-          Parse Markdown →
+        <button onClick={cmd((v) => toggleWrap(v, "**"))} title="Bold">
+          <Bold className="size-4" />
         </button>
-        <button onClick={extractMarkdown} disabled={!editor}>
-          ← Extract Markdown
+        <button onClick={cmd((v) => toggleWrap(v, "*"))} title="Italic">
+          <Italic className="size-4" />
         </button>
-        <span style={{ width: 1, height: 24, background: "#e5e7eb" }} />
-        <span style={{ width: 1, height: 24, background: "#e5e7eb" }} />
-<button onClick={() => wrap("**")}>Bold</button>
-<button onClick={() => wrap("*")}>Italic</button>
-<button onClick={() => wrap("==")}>Highlight</button>  
-    </div>
-
-      {error && <div className="error">{error}</div>}
+        <button onClick={cmd(cycleHeading)} title="Heading">
+          <Type className="size-4" />
+        </button>
+        <button onClick={cmd(insertLink)} title="Link">
+          <LinkIcon className="size-4" />
+        </button>
+      </div>
 
       <div className="split">
         <div className="pane">
-          <div className="label">Markdown Input</div>
+          <div className="label">Markdown</div>
           <div className="editor-box" style={{ padding: 0 }}>
             <CodeMirror
               ref={editorRef}
-              value={markdownInput}
+              value={text}
               height="100%"
-              extensions={[cmMarkdown()]}
-              onChange={setMarkdownInput}
+              extensions={[cmMarkdown(), history(), keymap.of(historyKeymap)]}
+              onChange={setText}
             />
           </div>
         </div>
 
         <div className="pane">
-          <div className="label">Tiptap Editor (rendered output)</div>
+          <div className="label">Preview</div>
           <div className="editor-box tiptap-output">
-            {editor ? <EditorContent editor={editor} /> : <div>Loading editor…</div>}
+            {editor && <EditorContent editor={editor} />}
           </div>
         </div>
       </div>

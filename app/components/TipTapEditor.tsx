@@ -693,16 +693,18 @@ export default function MarkdownEditor() {
         <div className="pane">
           <div className="label">Markdown</div>
           <div className="editor-box" style={{ padding: 0, overflow: "hidden" }}>
-            <Editor
-              ref={tuiRef}
-              initialValue={text}
-              previewStyle="tab"
-              height="100%"
-              initialEditType="markdown"
-              useCommandShortcut={true}
-              hideModeSwitch={true}
-              onChange={handleChange}
-            />
+        <Editor
+  ref={tuiRef}
+  initialValue={text}
+  height="100%"
+  minHeight="200px"
+  // theme="dark"   ← remove this, "light" is the default
+  previewStyle="tab"
+  initialEditType="markdown"
+  useCommandShortcut={true}
+  hideModeSwitch={true}
+  onChange={handleChange}
+/>
           </div>
         </div>
 

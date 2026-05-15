@@ -1,0 +1,334 @@
+/* ============================================================================
+   Toast UI Editor (left) + Tiptap preview (right), split layout
+   ----------------------------------------------------------------------------
+   DOM:
+     .md-demo                         ← root, fills the viewport
+     └── .split                       ← horizontal split
+         ├── .pane (left)             ← Toast UI markdown editor
+         │   ├── .editor-box          ← wraps <Editor />
+         │   └── .status-bar
+         └── .pane (right)            ← Tiptap preview
+             ├── .editor-box.tiptap-output
+             └── .status-bar
+
+   SCROLL MODEL:
+     html, body  → overflow: hidden        (no page scrollbar)
+     .md-demo    → height: 100dvh          (anchors the chain)
+     .split / .pane / .editor-box          (frames: flex:1 + min-height:0 + overflow:hidden)
+     .toastui-editor-md-container          (LEFT scrollbar lives here)
+     .tiptap-output                        (RIGHT scrollbar lives here)
+   ============================================================================ */
+
+
+/* ---------- 0. Page lock — kill the document scrollbar ---------- */
+html, body {
+  height: 100%;
+  margin: 0;
+  overflow: hidden;
+}
+
+
+/* ---------- 1. Root — anchors the height chain ---------- */
+.md-demo {
+  display: flex;
+  flex-direction: column;
+  height: 100dvh;
+  box-sizing: border-box;
+  padding: 0;
+  padding-top: 49px;          /* reserves space for the fixed toolbar */
+  overflow: hidden;
+  font-family: var(--font-lato), Lato, "Helvetica Neue", Helvetica, sans-serif;
+}
+
+
+/* ---------- 2. Scroll chain — frames that pass height down, don't scroll ---------- */
+.md-demo .split {
+  display: flex;
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+  gap: 8px;
+}
+
+.md-demo .pane {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  min-height: 0;
+  overflow: hidden;
+  position: relative;
+  gap: 8px;
+}
+
+.md-demo .label {
+  display: none;
+}
+
+.md-demo .editor-box {
+  flex: 1;
+  min-height: 0;
+  padding: 12px;
+  background: #fff;
+  border: 6px solid #d6d9dd;
+  border-radius: 10px;
+  overflow: hidden;           /* frame only — actual scrollbar lives one level deeper */
+}
+
+
+/* ---------- 3. The two actual scrollers ---------- */
+
+/* LEFT — Toast UI's own scroll container */
+.md-demo .toastui-editor-md-container {
+  height: 100% !important;
+  overflow: auto !important;
+}
+
+/* RIGHT — Tiptap preview */
+.md-demo .tiptap-output {
+  height: 100%;
+  overflow: scroll;
+  background: #f3f3f3;
+  padding-top: 0;
+  overflow-x: hidden;
+}
+
+
+/* ---------- 4. Toolbar (fixed at top, spans full width) ---------- */
+.md-demo .toastui-editor-toolbar,
+.md-demo .toastui-editor-defaultUI-toolbar {
+  position: fixed;
+  top: 2px;
+  left: 0;
+  right: 0;
+  z-index: 100;
+  padding: 5px 8px;
+  background: linear-gradient(to bottom, #2f2f33, #1e1e22);
+  border: 0.5px solid black;
+  border-radius: 5px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25);
+}
+
+.md-demo .toastui-editor-toolbar-group {
+  padding: 0 3px;
+}
+
+.md-demo .toastui-editor-toolbar-icons {
+  width: 26px;
+  height: 26px;
+  margin: 0 4px 0 1px;
+  padding: 4px;
+  border: none;
+  border-radius: 5px;
+  box-sizing: border-box;
+  background-color: transparent;
+  cursor: pointer;
+  filter: invert(1) brightness(4.05);
+  transition: background-color 0.15s ease, opacity 0.15s ease;
+}
+
+.md-demo .toastui-editor-toolbar-icons:hover {
+  background-color: rgba(255, 255, 255, 0.12);
+}
+
+.md-demo .toastui-editor-toolbar-icons:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+.md-demo .toastui-editor-toolbar-divider {
+  display: none;
+}
+
+/* Hide unused toolbar buttons */
+.md-demo .toastui-editor-toolbar-icons.hrline,
+.md-demo .toastui-editor-toolbar-icons.indent,
+.md-demo .toastui-editor-toolbar-icons.outdent,
+.md-demo .toastui-editor-toolbar-icons.image,
+.md-demo .toastui-editor-toolbar-icons.code {
+  display: none;
+}
+
+/* Active state */
+.md-demo .toastui-editor-toolbar-icons.active,
+.md-demo .toastui-editor-toolbar-icons.checked,
+.md-demo .toastui-editor-toolbar-icons[aria-pressed="true"] {
+  background-color: transparent !important;
+  filter: invert(1) brightness(1.05) !important;
+  opacity: 0.85 !important;
+  border: none !important;
+  box-shadow: none !important;
+}
+
+
+/* ---------- 5. Toast UI editing surface (left pane body) ---------- */
+.md-demo .toastui-editor-defaultUI {
+  border: none;
+  border-radius: 0;
+}
+
+.md-demo .toastui-editor-main {
+  border: none;
+}
+
+.md-demo .toastui-editor-md-container,
+.md-demo .toastui-editor-md-container .toastui-editor {
+  width: 100% !important;
+  max-width: none !important;
+  background: #fff;
+  color: #1f2937;
+}
+
+.md-demo .toastui-editor-md-container .ProseMirror {
+  padding: 16px 20px;
+  font-size: 15px;
+  line-height: 1.7;
+}
+
+/* Hide Toast UI's built-in preview / tab UI — we use Tiptap instead */
+.md-demo .toastui-editor-md-tab-container,
+.md-demo .toastui-editor-md-preview,
+.md-demo .toastui-editor-md-splitter,
+.md-demo .toastui-editor-md-vertical-style-toggle,
+.md-demo .toastui-editor-mode-switch {
+  display: none;
+}
+
+
+/* ---------- 6. Tiptap preview typography ---------- */
+.tiptap-output .ProseMirror {
+  min-height: 100%;
+  outline: none;
+  font-size: 15px;
+}
+
+.tiptap-output h1 { font-size: 1.8rem;  font-weight: 700; margin: 0.6em 0 0.3em; }
+.tiptap-output h2 { font-size: 1.4rem;  font-weight: 700; margin: 0.6em 0 0.3em; }
+.tiptap-output h3 { font-size: 1.15rem; font-weight: 600; margin: 0.5em 0 0.3em; }
+.tiptap-output p  { margin: 0.5em 0; line-height: 1.6; }
+.tiptap-output strong { font-weight: 700; }
+.tiptap-output em     { font-style: italic; }
+.tiptap-output a { color: #2563eb; text-decoration: underline; }
+
+.tiptap-output ul,
+.tiptap-output ol { margin: 0.5em 0; padding-left: 1.5em; }
+.tiptap-output ul { list-style: disc; }
+.tiptap-output ol { list-style: decimal; }
+
+.tiptap-output ul[data-type="taskList"] { list-style: none; padding-left: 0; }
+.tiptap-output ul[data-type="taskList"] li { display: flex; align-items: flex-start; gap: 8px; }
+.tiptap-output ul[data-type="taskList"] li > label { flex-shrink: 0; margin-top: 4px; }
+.tiptap-output ul[data-type="taskList"] li > div   { flex: 1; }
+
+.tiptap-output blockquote {
+  margin: 0.5em 0;
+  padding: 0.2em 0.8em;
+  border-left: 3px solid #d1d5db;
+  color: #4b5563;
+}
+
+.tiptap-output pre {
+  margin: 0.8em 0;
+  padding: 12px;
+  background: #1f2937;
+  color: #f3f4f6;
+  border-radius: 6px;
+  overflow-x: auto;
+}
+.tiptap-output pre code { padding: 0; background: transparent; color: inherit; }
+
+.tiptap-output img { max-width: 100%; margin: 0.5em 0; border-radius: 4px; }
+
+.tiptap-output table { width: 100%; margin: 0.5em 0; border-collapse: collapse; }
+.tiptap-output table td,
+.tiptap-output table th { padding: 6px 10px; border: 1px solid #d1d5db; }
+.tiptap-output table th { background: #f9fafb; font-weight: 600; }
+
+.tiptap-output .mention {
+  padding: 2px 6px;
+  background: #e0e7ff;
+  color: #3730a3;
+  border-radius: 4px;
+  font-weight: 500;
+}
+
+.tiptap-output [data-type="block-math"] {
+  margin: 1rem 0;
+  padding: 0.5rem;
+  background: #f8fafc;
+  border-radius: 4px;
+  text-align: center;
+}
+
+.tiptap-output iframe {
+  max-width: 100%;
+  margin: 0.5em 0;
+  border: none;
+  border-radius: 6px;
+}
+
+.tiptap-output details {
+  margin: 0.5em 0;
+  padding: 8px 12px;
+  border: 1px solid #e5e7eb;
+  border-radius: 6px;
+}
+.tiptap-output details summary { cursor: pointer; font-weight: 600; }
+
+.tiptap-output mark {
+  padding: 0 2px;
+  background: #fef08a;
+  border-radius: 2px;
+}
+
+
+/* ---------- 7. Status bars ---------- */
+.md-demo .status-bar {
+  display: flex;
+  gap: 16px;
+  padding: 6px 12px;
+  background: #f9fafb;
+  border: 1px solid #e5e7eb;
+  border-top: none;
+  border-radius: 0 0 6px 6px;
+  font-size: 12px;
+  color: #6b7280;
+}
+
+.md-demo .status-bar span:first-child {
+  color: #374151;
+  font-weight: 600;
+}
+
+
+/* ---------- 8. Mobile — stack panes vertically ---------- */
+@media (max-width: 768px) {
+  .md-demo {
+    height: 100dvh;
+    padding: 8px;
+    padding-top: 57px;          /* toolbar + a bit of breathing room */
+    gap: 8px;
+  }
+
+  .md-demo .split {
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .md-demo .pane {
+    flex: 1 1 0;
+    min-height: 250px;
+  }
+
+  .tiptap-output iframe,
+  .tiptap-output img {
+    max-width: 100%;
+    height: auto;
+  }
+
+  .md-demo .toastui-editor-defaultUI-toolbar {
+    overflow-x: auto;
+    overflow-y: hidden;
+    flex-wrap: nowrap;
+  }
+}

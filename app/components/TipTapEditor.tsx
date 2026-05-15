@@ -4,6 +4,9 @@ import "katex/dist/katex.min.css";
 import "@toast-ui/editor/dist/toastui-editor.css";
 
 import { useState, useRef, useEffect } from "react";
+import dynamic from "next/dynamic";
+
+import "./styles.css"
 
 // Tiptap
 import { EditorContent, useEditor } from "@tiptap/react";
@@ -19,11 +22,13 @@ import { TableKit } from "@tiptap/extension-table";
 import { Twitch } from "@tiptap/extension-twitch";
 import { Youtube } from "@tiptap/extension-youtube";
 
-// TOAST UI Editor
-import { Editor } from "@toast-ui/react-editor";
+// TOAST UI Editor — loaded only in the browser (touches `Element` at module load)
+const Editor = dynamic(
+  () => import("@toast-ui/react-editor").then((m) => m.Editor),
+  { ssr: false }
+);
 
 import { mdContent } from "./content";
-import { styles } from "./styles";
 
 export default function MarkdownEditor() {
   const topToolbarRef = useRef<HTMLDivElement>(null);
@@ -149,33 +154,13 @@ export default function MarkdownEditor() {
   }, [editor]);
 
 
-useEffect(() => {
-  const moveToolbar = () => {
-    const leftPane = leftPaneRef.current;
-    const host = topToolbarRef.current;
-    if (!leftPane || !host) return false;
+// Synchronized proportional scrolling — left ↔ right (auto-detect scrollers)
 
-    const toolbar = leftPane.querySelector<HTMLElement>(".toastui-editor-toolbar");
-    if (!toolbar) return false;
-
-    if (toolbar.parentElement !== host) {
-      host.appendChild(toolbar);
-    }
-    return true;
-  };
-
-  // Toast UI mounts asynchronously — retry a few frames until the toolbar exists
-  let tries = 0;
-  const tick = () => {
-    if (moveToolbar() || tries++ > 20) return;
-    requestAnimationFrame(tick);
-  };
-  tick();
-}, []);
+  
+// Synchronized scrolling — Toast UI (left) ↔ Tiptap (right)
 
   return (
     <div className="md-demo">
-      <style>{styles}</style>
 {/* <div ref={topToolbarRef} className="top-toolbar" /> */}
       <div className="split">
         {/* Left — TOAST UI editor */}

@@ -3,7 +3,6 @@
 :root {
   --background: #ffffff;
   --foreground: #171717;
-
 }
 @theme inline {
   --color-background: var(--background);
@@ -15,7 +14,7 @@
 html, body {
   margin: 0;
   padding: 0;
-  height: 100%;
+  height: 100vh;
   background: var(--background);
   color: var(--foreground);
   font-family: var(--font-lato), Lato, "Helvetica Neue", Helvetica, sans-serif;

@@ -9,6 +9,7 @@
     "lint": "eslint"
   },
   "dependencies": {
+    "@codemirror/view": "^6.43.0",
     "@fontsource/lato": "^5.2.7",
     "@tiptap/extension-details": "^3.23.4",
     "@tiptap/extension-highlight": "^3.23.4",

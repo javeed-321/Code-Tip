@@ -26,6 +26,7 @@ import { mdContent } from "./content";
 import { styles } from "./styles";
 
 export default function MarkdownEditor() {
+  const topToolbarRef = useRef<HTMLDivElement>(null);
   const [closeRightPane, setCloseRightPane] = useState(false);
 
   const [text, setText] = useState(mdContent);
@@ -146,10 +147,36 @@ export default function MarkdownEditor() {
       editor.off("update", compute);
     };
   }, [editor]);
+
+
+useEffect(() => {
+  const moveToolbar = () => {
+    const leftPane = leftPaneRef.current;
+    const host = topToolbarRef.current;
+    if (!leftPane || !host) return false;
+
+    const toolbar = leftPane.querySelector<HTMLElement>(".toastui-editor-toolbar");
+    if (!toolbar) return false;
+
+    if (toolbar.parentElement !== host) {
+      host.appendChild(toolbar);
+    }
+    return true;
+  };
+
+  // Toast UI mounts asynchronously — retry a few frames until the toolbar exists
+  let tries = 0;
+  const tick = () => {
+    if (moveToolbar() || tries++ > 20) return;
+    requestAnimationFrame(tick);
+  };
+  tick();
+}, []);
+
   return (
     <div className="md-demo">
       <style>{styles}</style>
-
+{/* <div ref={topToolbarRef} className="top-toolbar" /> */}
       <div className="split">
         {/* Left — TOAST UI editor */}
         <div ref={leftPaneRef} className="pane">
@@ -162,19 +189,19 @@ export default function MarkdownEditor() {
               minHeight="200px"
               previewStyle="tab"
               initialEditType="markdown"
-              useCommandShortcut={true}
+              useCommandShortcut={false}
               hideModeSwitch={true}
               onChange={handleChange}
             />
 
 
           </div>
-          <div>
+          {/* <div>
             <button onClick={() => {
               setCloseRightPane((prev) => !prev)
               console.log("Toggling right pane, now closeRightPane =", closeRightPane)
             }}><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" stroke-linejoin="round" className="lucide lucide-toggle-right-icon lucide-toggle-right"><circle cx="15" cy="12" r="3" /><rect width="20" height="14" x="2" y="5" rx="7" /></svg></button>
-          </div>
+          </div> */}
           <div className="status-bar">
             <span>Markdown</span><br />
             <span>{mdStats.bytes} {"   "} bytes</span>

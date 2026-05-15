@@ -1,26 +1,27 @@
+
 /* ============================================================================
    Toast UI Editor (left) + Tiptap preview (right), split layout
-   ----------------------------------------------------------------------------
+
    DOM:
-     .md-demo                         ← root, fills the viewport
-     └── .split                       ← horizontal split
-         ├── .pane (left)             ← Toast UI markdown editor
-         │   ├── .editor-box          ← wraps <Editor />
+     .md-demo
+     └── .split
+         ├── .pane (left)
+         │   ├── .editor-box        ← wraps <Editor />
          │   └── .status-bar
-         └── .pane (right)            ← Tiptap preview
+         └── .pane (right)
              ├── .editor-box.tiptap-output
              └── .status-bar
 
    SCROLL MODEL:
-     html, body  → overflow: hidden        (no page scrollbar)
-     .md-demo    → height: 100dvh          (anchors the chain)
-     .split / .pane / .editor-box          (frames: flex:1 + min-height:0 + overflow:hidden)
-     .toastui-editor-md-container          (LEFT scrollbar lives here)
-     .tiptap-output                        (RIGHT scrollbar lives here)
+     html, body                        → overflow: hidden  (no page scrollbar)
+     .md-demo                          → height: 100dvh    (anchors chain)
+     .split / .pane / .editor-box      → flex:1 + min-height:0 + overflow:hidden
+     .toastui-editor-md-container      → LEFT scrollbar
+     .tiptap-output                    → RIGHT scrollbar
    ============================================================================ */
 
 
-/* ---------- 0. Page lock — kill the document scrollbar ---------- */
+/* ---------- 0. Page lock ---------- */
 html, body {
   height: 100%;
   margin: 0;
@@ -28,20 +29,20 @@ html, body {
 }
 
 
-/* ---------- 1. Root — anchors the height chain ---------- */
+/* ---------- 1. Root ---------- */
 .md-demo {
   display: flex;
   flex-direction: column;
   height: 100dvh;
   box-sizing: border-box;
   padding: 0;
-  padding-top: 49px;          /* reserves space for the fixed toolbar */
+  padding-top: 49px;          /* reserves space for fixed toolbar */
   overflow: hidden;
   font-family: var(--font-lato), Lato, "Helvetica Neue", Helvetica, sans-serif;
 }
 
 
-/* ---------- 2. Scroll chain — frames that pass height down, don't scroll ---------- */
+/* ---------- 2. Scroll chain (frames — don't scroll themselves) ---------- */
 .md-demo .split {
   display: flex;
   flex: 1;
@@ -72,31 +73,28 @@ html, body {
   background: #fff;
   border: 6px solid #d6d9dd;
   border-radius: 10px;
-  overflow: hidden;           /* frame only — actual scrollbar lives one level deeper */
+  overflow: hidden;           /* actual scrollbar lives one level deeper */
 }
 
 
-/* ---------- 3. The two actual scrollers ---------- */
-
-/* LEFT — Toast UI's own scroll container */
+/* ---------- 3. The two real scrollers ---------- */
 .md-demo .toastui-editor-md-container {
   height: 100% !important;
   overflow: auto !important;
 }
 
-/* RIGHT — Tiptap preview */
 .md-demo .tiptap-output {
   height: 100%;
-  overflow: scroll;
-  background: #f3f3f3;
-  padding-top: 0;
+  overflow-y: auto;
   overflow-x: hidden;
+  background: #f3f3f3;
 }
 
 
-/* ---------- 4. Toolbar (fixed at top, spans full width) ---------- */
+/* ---------- 4. Toolbar (fixed at top) ---------- */
 .md-demo .toastui-editor-toolbar,
 .md-demo .toastui-editor-defaultUI-toolbar {
+
   position: fixed;
   top: 2px;
   left: 0;
@@ -106,6 +104,7 @@ html, body {
   background: linear-gradient(to bottom, #2f2f33, #1e1e22);
   border: 0.5px solid black;
   border-radius: 5px;
+  
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25);
 }
 
@@ -128,8 +127,21 @@ html, body {
 }
 
 .md-demo .toastui-editor-toolbar-icons:hover {
-  background-color: rgba(255, 255, 255, 0.12);
+   width: 26px !important;
+  height: 26px !important;
+  margin: 0 4px 0 1px !important ;
+  padding: 4px !important;
+  border: none !important;
+  border-radius: 5px !important;
+  box-sizing: border-box !important;
+  background-color: transparent !important;
+  cursor: pointer !important;
+  filter: invert(1) brightness(4.05) !important;
+  transition: background-color 0.15s ease, opacity 0.15s ease !important;
+
 }
+
+
 
 .md-demo .toastui-editor-toolbar-icons:disabled {
   opacity: 0.35;
@@ -140,7 +152,6 @@ html, body {
   display: none;
 }
 
-/* Hide unused toolbar buttons */
 .md-demo .toastui-editor-toolbar-icons.hrline,
 .md-demo .toastui-editor-toolbar-icons.indent,
 .md-demo .toastui-editor-toolbar-icons.outdent,
@@ -149,7 +160,6 @@ html, body {
   display: none;
 }
 
-/* Active state */
 .md-demo .toastui-editor-toolbar-icons.active,
 .md-demo .toastui-editor-toolbar-icons.checked,
 .md-demo .toastui-editor-toolbar-icons[aria-pressed="true"] {
@@ -160,8 +170,18 @@ html, body {
   box-shadow: none !important;
 }
 
+.toastui-editor-md-tab-container .tab-item.active{
+  display:none;
+}
 
-/* ---------- 5. Toast UI editing surface (left pane body) ---------- */
+.toastui-editor-defaultUI .toastui-editor-md-tab-container{
+  display:none;
+}
+.toastui-editor-md-tab-container,.toastui-editor-md-tab-container .toastui-editor-tabs
+{
+  display:none;
+}
+/* ---------- 5. Toast UI editing surface ---------- */
 .md-demo .toastui-editor-defaultUI {
   border: none;
   border-radius: 0;
@@ -185,7 +205,6 @@ html, body {
   line-height: 1.7;
 }
 
-/* Hide Toast UI's built-in preview / tab UI — we use Tiptap instead */
 .md-demo .toastui-editor-md-tab-container,
 .md-demo .toastui-editor-md-preview,
 .md-demo .toastui-editor-md-splitter,
@@ -301,12 +320,12 @@ html, body {
 }
 
 
-/* ---------- 8. Mobile — stack panes vertically ---------- */
+/* ---------- 8. Mobile ---------- */
 @media (max-width: 768px) {
   .md-demo {
     height: 100dvh;
     padding: 8px;
-    padding-top: 57px;          /* toolbar + a bit of breathing room */
+    padding-top: 57px;
     gap: 8px;
   }
 
@@ -331,4 +350,36 @@ html, body {
     overflow-y: hidden;
     flex-wrap: nowrap;
   }
+}
+
+/* Force Toast UI's markdown content into normal flow so it overflows */
+.md-demo .toastui-editor-md-container .toastui-editor {
+  position: static !important;
+  height: auto !important;
+  min-height: 100% !important;
+}
+
+.md-demo .toastui-editor-md-container .ProseMirror {
+  min-height: 100% !important;
+    -webkit-spellcheck: false;
+
+}
+
+/* LEFT scroller — the wrapper, not Toast UI's internal element */
+.md-demo .editor-box-left {
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+/* Let Toast UI's content grow naturally instead of locking to 100% */
+.md-demo .toastui-editor-md-container {
+  height: auto !important;
+  overflow: visible !important;
+}
+
+.md-demo .toastui-editor-defaultUI,
+.md-demo .toastui-editor-main,
+.md-demo .toastui-editor-md-container .toastui-editor {
+  height: auto !important;
+  overflow: visible !important;
 }

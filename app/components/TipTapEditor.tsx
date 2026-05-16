@@ -273,6 +273,8 @@ export default function MarkdownEditor() {
     words: 0,
     paragraphs: 0,
   });
+  const [tuiReady, setTuiReady] = useState(false);
+
 // Load the saved doc from IndexedDB on first mount.
 // Fall back to the demo content if there's nothing stored yet.
 useEffect(() => {
@@ -300,7 +302,7 @@ useEffect(() => {
     saveCurrentDoc(text)
       .then(() => setSaveStatus("saved"))
       .catch((err) => console.error("Autosave failed:", err));
-  }, 500);
+  }, 100);
   return () => clearTimeout(id);
 }, [text, hydrated]);
 
@@ -361,38 +363,50 @@ useEffect(() => {
       
       } catch {
         /* ignore */
+        console.log("Failed to set Tiptap content — probably invalid markdown:", { text });
       }
-    }, 150);
+    }, 25);
     
     return () => clearTimeout(id);
   }, [text, editor]);
 
-  // --- Toast UI caret → Ln/Col status ---
-  useEffect(() => {
-    const inst = tuiRef.current?.getInstance();
-    if (!inst) return;
+  // --- Toast UI caret → Ln/Col  ---
+useEffect(() => {
+  if (!tuiReady) return;
+  const inst = tuiRef.current?.getInstance();
+  if (!inst) return;
 
-    const onCaret = () => {
-      try {
-        const sel = inst.getSelection();
-        if (Array.isArray(sel?.[0])) {
-          const [line, col] = sel[0];
-          setCursor({ line, col });
-        }
-      } catch {
-        /* ignore */
+  const updateCursor = () => {
+    try {
+      const sel = inst.getSelection();
+      // markdown mode: [[startLine, startCol], [endLine, endCol]]
+      if (Array.isArray(sel?.[0])) {
+        const [line, col] = sel[0];
+        setCursor({ line, col });
       }
-    };
+    } catch {
+      /* ignore */
+    }
+  };
 
-    inst.on("caretChange", onCaret);
-    inst.on("focus", onCaret);
-    onCaret();
+  // Toast UI's own events (work for typing, not always for clicks/arrows)
+  inst.on("caretChange", updateCursor);
+  inst.on("focus", updateCursor);
+  inst.on("change", updateCursor);
 
-    return () => {
-      inst.off("caretChange", onCaret);
-      inst.off("focus", onCaret);
-    };
-  }, []);
+  // Native event — fires reliably on every cursor move
+  document.addEventListener("selectionchange", updateCursor);
+
+  updateCursor();
+
+  return () => {
+    inst.off("caretChange", updateCursor);
+    inst.off("focus", updateCursor);
+    inst.off("change", updateCursor);
+    document.removeEventListener("selectionchange", updateCursor);
+  };
+}, [tuiReady]);
+
 
   // --- Tiptap content → preview stats ---
   useEffect(() => {
@@ -463,7 +477,8 @@ useEffect(() => {
       leftEl?.removeEventListener("scroll", syncLeftToRight);
       rightEl?.removeEventListener("scroll", syncRightToLeft);
     };
-  }, []);
+  }, [hydrated]);
+
 useEffect(() => {
   const inst = tuiRef.current?.getInstance();
   if (!inst) return;
@@ -496,6 +511,8 @@ useEffect(() => {
               height="auto"
               minHeight="200px"
               previewStyle="tab"
+                onLoad={() => setTuiReady(true)}
+
               initialEditType="markdown"
               useCommandShortcut={true}
               hideModeSwitch={true}

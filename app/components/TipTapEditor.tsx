@@ -2,6 +2,7 @@
 
 import "katex/dist/katex.min.css";
 import "@toast-ui/editor/dist/toastui-editor.css";
+import "@toast-ui/editor/dist/theme/toastui-editor-dark.css";
 
 import { useState, useRef, useEffect } from "react";
 import dynamic from "next/dynamic";
@@ -57,6 +58,7 @@ export default function MarkdownEditor() {
     paragraphs: 0,
   });
   const [tuiReady, setTuiReady] = useState(false);
+const [darkMode, setDarkMode] = useState(false);
 
 // Load the saved doc from IndexedDB on first mount.
 // Fall back to the demo content if there's nothing stored yet.
@@ -278,6 +280,20 @@ useEffect(() => {
   });
 }, [text]);
 
+  // --- Toggle Toast UI dark theme on button click ---
+  // Uses the functional updater so it works correctly even when called
+  // from a click handler captured at editor-mount time.
+  const toggleDarkMode = () => {
+    setDarkMode((prev) => {
+      const next = !prev;
+      const root = document.querySelector(".toastui-editor-defaultUI");
+      if (root) root.classList.toggle("toastui-editor-dark", next);
+      const injected = document.querySelector<HTMLButtonElement>(".dark-mode-toggle");
+      if (injected) injected.textContent = next ? "Light" : "Dark";
+      return next;
+    });
+  };
+
   if (!hydrated) {
     return <div className="md-demo">Loading…</div>;
   }
@@ -286,6 +302,7 @@ useEffect(() => {
     <div className="md-demo">
       <div className="split">
         {/* Left — Toast UI markdown editor */}
+        
         <div ref={leftPaneRef} className="pane">
           <div className="label">Markdown</div>
 <div className="editor-box editor-box-left" style={{ padding: 0 }}>            <Editor
@@ -294,7 +311,44 @@ useEffect(() => {
               height="auto"
               minHeight="200px"
               previewStyle="tab"
-                onLoad={() => setTuiReady(true)}
+              onLoad={() => {
+                setTuiReady(true);
+
+                // Inject the dark/light toggle button into the Toast UI toolbar.
+                // Retry for a few frames in case the toolbar DOM isn't ready yet.
+                const inject = (tries = 0) => {
+                  const toolbar = document.querySelector(".toastui-editor-defaultUI-toolbar");
+                  if (!toolbar) {
+                    if (tries < 30) requestAnimationFrame(() => inject(tries + 1));
+                    return;
+                  }
+                  if (toolbar.querySelector(".dark-mode-toggle")) return;
+
+                  const btn = document.createElement("button");
+                  btn.type = "button";
+                  btn.className = "dark-mode-toggle";
+                  btn.textContent = "Dark";
+                  btn.style.cssText = [
+                    "margin-left: auto",
+                    "margin-right: 12px",
+                    "margin-bottom::24px",
+                    "width: 60px",
+                    "padding: 6px 4px",
+                    "border-radius: 6px",
+                    "border: 1px solid #ffffff",
+                    "background: #ffffff",
+                    "color: #1e1e22",
+                    "font-size: 13px",
+                    "font-weight: 600",
+                    "cursor: pointer",
+                    "z-index: 9999",
+                    "position: relative",
+                  ].join(";");
+                  btn.addEventListener("click", toggleDarkMode);
+                  toolbar.appendChild(btn);
+                };
+                inject();
+              }}
 
               initialEditType="markdown"
               useCommandShortcut={true}
@@ -302,7 +356,8 @@ useEffect(() => {
               onChange={handleChange}
             />
           </div>
-          <div className="status-bar">
+          
+          <div className={`status-bar ${darkMode ? "status-bar-darkmode" : ""}`}>
             <span>Markdown</span>
             <span>{mdStats.bytes} bytes</span>
             <span>{mdStats.words} words</span>
@@ -315,10 +370,11 @@ useEffect(() => {
         {/* Right — Tiptap rendered preview */}
         <div className="pane">
           <div className="label">Preview</div>
-          <div ref={rightBoxRef} className="editor-box tiptap-output">
+          <div ref={rightBoxRef}   className={`editor-box tiptap-output ${darkMode ? "tiptap-dark" : ""}`}
+>
             {editor && <EditorContent editor={editor} />}
           </div>
-          <div className="status-bar">
+          <div className={`status-bar ${darkMode ? "status-bar-darkmode" : ""}`}>
             <span>HTML</span>
             <span>{previewStats.chars} characters</span>
             <span>{previewStats.words} words</span>

@@ -8,12 +8,14 @@
 .md-demo .toastui-editor-main {
   border: none;
 }
-
+.md-demo .toastui-editor-dark{
+  background: red !important;
+}
 .md-demo .toastui-editor-md-container,
 .md-demo .toastui-editor-md-container .toastui-editor {
   width: 100% !important;
   max-width: none !important;
-  background: #fff;
+  /* background: transparent; */
   color: #1f2937;
 }
 

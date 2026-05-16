@@ -4,7 +4,7 @@
   display: flex;
   gap: 16px;
   padding: 6px 12px;
-  background: #f9fafb;
+  background: red;
   border: 1px solid #e5e7eb;
   border-top: none;
   border-radius: 0 0 6px 6px;
@@ -47,4 +47,10 @@
 }
 :root.dark .md-demo .status-bar .export-btn:hover {
   background: rgba(255, 255, 255, 0.08);
+}
+
+
+.status-bar-darkmode{
+  background-color: #374151 !important;
+  color:#e6e6e6 !important;
 }

@@ -105,3 +105,74 @@
   background: #fef08a;
   border-radius: 2px;
 }
+
+
+
+
+/* ============================================================================
+   Dark mode — only applies when .tiptap-output ALSO has .tiptap-dark
+   Each component gets its own text-color rule, not inherited.
+   ============================================================================ */
+
+/* Container */
+.tiptap-output.tiptap-dark              { background: #1e1e22; color: #e5e7eb; }
+
+/* Headings */
+.tiptap-output.tiptap-dark h1           { color: #f9fafb; }
+.tiptap-output.tiptap-dark h2           { color: #f3f4f6; }
+.tiptap-output.tiptap-dark h3           { color: #e5e7eb; }
+
+/* Body text */
+.tiptap-output.tiptap-dark p            { color: #e5e7eb; }
+.tiptap-output.tiptap-dark strong       { color: #ffffff; }
+.tiptap-output.tiptap-dark em           { color: #e5e7eb; }
+
+/* Links */
+.tiptap-output.tiptap-dark a            { color: #60a5fa; }
+
+/* Lists */
+.tiptap-output.tiptap-dark ul,
+.tiptap-output.tiptap-dark ol           { color: #e5e7eb; }
+.tiptap-output.tiptap-dark li           { color: #e5e7eb; }
+
+/* Task list */
+.tiptap-output.tiptap-dark ul[data-type="taskList"] li > label { color: #e5e7eb; }
+.tiptap-output.tiptap-dark ul[data-type="taskList"] li > div   { color: #e5e7eb; }
+
+/* Blockquote */
+.tiptap-output.tiptap-dark blockquote   { color: #9ca3af; border-left-color: #4b5563; }
+
+/* Code block (pre) */
+.tiptap-output.tiptap-dark pre          { background: #2d333b; color: #e5e7eb; border-color: #4b5563; }
+.tiptap-output.tiptap-dark pre code     { color: #e5e7eb; }
+
+/* Syntax highlighting — brighter, dark-bg-friendly colors */
+.tiptap-output.tiptap-dark .hljs-keyword,
+.tiptap-output.tiptap-dark .hljs-built_in   { color: #ff7b72; }   /* import, from, const */
+.tiptap-output.tiptap-dark .hljs-string     { color: #a5d6ff; }   /* '@tiptap/core'      */
+.tiptap-output.tiptap-dark .hljs-title,
+.tiptap-output.tiptap-dark .hljs-class,
+.tiptap-output.tiptap-dark .hljs-function   { color: #d2a8ff; }   /* Editor, StarterKit  */
+.tiptap-output.tiptap-dark .hljs-comment    { color: #8b949e; }   /* // comment          */
+.tiptap-output.tiptap-dark .hljs-number,
+.tiptap-output.tiptap-dark .hljs-literal    { color: #79c0ff; }
+.tiptap-output.tiptap-dark .hljs-attr,
+.tiptap-output.tiptap-dark .hljs-variable   { color: #e5e7eb; }
+
+/* Tables */
+.tiptap-output.tiptap-dark table td,
+.tiptap-output.tiptap-dark table th         { color: #e5e7eb; border-color: #4b5563; }
+.tiptap-output.tiptap-dark table th         { background: #2d333b; color: #f9fafb; }
+
+/* Mention pill */
+.tiptap-output.tiptap-dark .mention         { background: #312e81; color: #c7d2fe; }
+
+/* Block math */
+.tiptap-output.tiptap-dark [data-type="block-math"] { background: #2d333b; color: #e5e7eb; }
+
+/* Details / Summary */
+.tiptap-output.tiptap-dark details          { border-color: #4b5563; color: #e5e7eb; }
+.tiptap-output.tiptap-dark details summary  { color: #f3f4f6; }
+
+/* Highlight (mark) */
+.tiptap-output.tiptap-dark mark             { background: #b45309; color: #fff; }

@@ -1,0 +1,63 @@
+/* ---------- 8. Mobile ---------- */
+@media (max-width: 768px) {
+  .md-demo {
+    height: 100dvh;
+    padding: 8px;
+    padding-top: 57px;
+    gap: 8px;
+  }
+
+  .md-demo .split {
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .md-demo .pane {
+    flex: 1 1 0;
+    min-height: 250px;
+  }
+
+  .tiptap-output iframe,
+  .tiptap-output img {
+    max-width: 100%;
+    height: auto;
+  }
+
+  .md-demo .toastui-editor-defaultUI-toolbar {
+    overflow-x: auto;
+    overflow-y: hidden;
+    flex-wrap: nowrap;
+  }
+}
+
+/* Force Toast UI's markdown content into normal flow so it overflows */
+.md-demo .toastui-editor-md-container .toastui-editor {
+  position: static !important;
+  height: auto !important;
+  min-height: 100% !important;
+}
+
+.md-demo .toastui-editor-md-container .ProseMirror {
+  min-height: 100% !important;
+    -webkit-spellcheck: false;
+
+}
+
+/* LEFT scroller — the wrapper, not Toast UI's internal element */
+.md-demo .editor-box-left {
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+/* Let Toast UI's content grow naturally instead of locking to 100% */
+.md-demo .toastui-editor-md-container {
+  height: auto !important;
+  overflow: visible !important;
+}
+
+.md-demo .toastui-editor-defaultUI,
+.md-demo .toastui-editor-main,
+.md-demo .toastui-editor-md-container .toastui-editor {
+  height: auto !important;
+  overflow: visible !important;
+}

@@ -1,0 +1,32 @@
+
+/* ---------- 5. Toast UI editing surface ---------- */
+.md-demo .toastui-editor-defaultUI {
+  border: none;
+  border-radius: 0;
+}
+
+.md-demo .toastui-editor-main {
+  border: none;
+}
+
+.md-demo .toastui-editor-md-container,
+.md-demo .toastui-editor-md-container .toastui-editor {
+  width: 100% !important;
+  max-width: none !important;
+  background: #fff;
+  color: #1f2937;
+}
+
+.md-demo .toastui-editor-md-container .ProseMirror {
+  padding: 16px 20px;
+  font-size: 15px;
+  line-height: 1.7;
+}
+
+.md-demo .toastui-editor-md-tab-container,
+.md-demo .toastui-editor-md-preview,
+.md-demo .toastui-editor-md-splitter,
+.md-demo .toastui-editor-md-vertical-style-toggle,
+.md-demo .toastui-editor-mode-switch {
+  display: none;
+}

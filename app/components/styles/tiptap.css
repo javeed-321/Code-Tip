@@ -1,0 +1,86 @@
+
+/* ---------- 6. Tiptap preview typography ---------- */
+.tiptap-output .ProseMirror {
+  min-height: 100%;
+  outline: none;
+  font-size: 15px;
+}
+
+.tiptap-output h1 { font-size: 1.8rem;  font-weight: 700; margin: 0.6em 0 0.3em; }
+.tiptap-output h2 { font-size: 1.4rem;  font-weight: 700; margin: 0.6em 0 0.3em; }
+.tiptap-output h3 { font-size: 1.15rem; font-weight: 600; margin: 0.5em 0 0.3em; }
+.tiptap-output p  { margin: 0.5em 0; line-height: 1.6; }
+.tiptap-output strong { font-weight: 700; }
+.tiptap-output em     { font-style: italic; }
+.tiptap-output a { color: #2563eb; text-decoration: underline; }
+
+.tiptap-output ul,
+.tiptap-output ol { margin: 0.5em 0; padding-left: 1.5em; }
+.tiptap-output ul { list-style: disc; }
+.tiptap-output ol { list-style: decimal; }
+
+.tiptap-output ul[data-type="taskList"] { list-style: none; padding-left: 0; }
+.tiptap-output ul[data-type="taskList"] li { display: flex; align-items: flex-start; gap: 8px; }
+.tiptap-output ul[data-type="taskList"] li > label { flex-shrink: 0; margin-top: 4px; }
+.tiptap-output ul[data-type="taskList"] li > div   { flex: 1; }
+
+.tiptap-output blockquote {
+  margin: 0.5em 0;
+  padding: 0.2em 0.8em;
+  border-left: 3px solid #d1d5db;
+  color: #4b5563;
+}
+
+.tiptap-output pre {
+  margin: 0.8em 0;
+  padding: 12px;
+  /* background:black; */
+  /* color: #f3f4f6; */
+  border-radius: 6px;
+  overflow-x: auto;
+}
+.tiptap-output pre code { padding: 0; background: transparent; color: inherit; }
+
+.tiptap-output img { max-width: 100%; margin: 0.5em 0; border-radius: 4px; }
+
+.tiptap-output table { width: 100%; margin: 0.5em 0; border-collapse: collapse; }
+.tiptap-output table td,
+.tiptap-output table th { padding: 6px 10px; border: 1px solid #d1d5db; }
+.tiptap-output table th { background: #f9fafb; font-weight: 600; }
+
+.tiptap-output .mention {
+  padding: 2px 6px;
+  background: #e0e7ff;
+  color: #3730a3;
+  border-radius: 4px;
+  font-weight: 500;
+}
+
+.tiptap-output [data-type="block-math"] {
+  margin: 1rem 0;
+  padding: 0.5rem;
+  background: #f8fafc;
+  border-radius: 4px;
+  text-align: center;
+}
+
+.tiptap-output iframe {
+  max-width: 100%;
+  margin: 0.5em 0;
+  border: none;
+  border-radius: 6px;
+}
+
+.tiptap-output details {
+  margin: 0.5em 0;
+  padding: 8px 12px;
+  border: 1px solid #e5e7eb;
+  border-radius: 6px;
+}
+.tiptap-output details summary { cursor: pointer; font-weight: 600; }
+
+.tiptap-output mark {
+  padding: 0 2px;
+  background: #fef08a;
+  border-radius: 2px;
+}

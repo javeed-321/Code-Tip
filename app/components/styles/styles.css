@@ -1,0 +1,82 @@
+
+/* ============================================================================
+   Toast UI Editor (left) + Tiptap preview (right), split layout
+
+   DOM:
+     .md-demo
+     └── .split
+         ├── .pane (left)
+         │   ├── .editor-box        ← wraps <Editor />
+         │   └── .status-bar
+         └── .pane (right)
+             ├── .editor-box.tiptap-output
+             └── .status-bar
+
+   SCROLL MODEL:
+     html, body                        → overflow: hidden  (no page scrollbar)
+     .md-demo                          → height: 100dvh    (anchors chain)
+     .split / .pane / .editor-box      → flex:1 + min-height:0 + overflow:hidden
+     .toastui-editor-md-container      → LEFT scrollbar
+     .tiptap-output                    → RIGHT scrollbar
+   ============================================================================ */
+
+
+/* ---------- 0. Page lock ---------- */
+html, body {
+  height: 100%;
+  margin: 0;
+  overflow: hidden;
+}
+
+
+/* ---------- 1. Root ---------- */
+.md-demo {
+  display: flex;
+  flex-direction: column;
+  height: 100dvh;
+  box-sizing: border-box;
+  padding: 0;
+  padding-top: 49px;          /* reserves space for fixed toolbar */
+  overflow: hidden;
+  font-family: var(--font-lato), Lato, "Helvetica Neue", Helvetica, sans-serif;
+}
+
+
+/* ---------- 2. Scroll chain (frames — don't scroll themselves) ---------- */
+.md-demo .split {
+  display: flex;
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+  gap: 8px;
+}
+
+.md-demo .pane {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  min-height: 0;
+  overflow: hidden;
+  position: relative;
+  gap: 8px;
+}
+
+.md-demo .label {
+  display: none;
+}
+
+.md-demo .editor-box {
+  flex: 1;
+  min-height: 0;
+  padding: 12px;
+  background: #fff;
+  border: 6px solid #d6d9dd;
+  border-radius: 10px;
+  overflow: auto;           /* actual scrollbar lives one level deeper */
+}
+
+
+
+
+

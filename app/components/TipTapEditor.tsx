@@ -223,8 +223,13 @@ import "@toast-ui/editor/dist/toastui-editor.css";
 
 import { useState, useRef, useEffect } from "react";
 import dynamic from "next/dynamic";
+import { CodeBlockLowlight } from "@tiptap/extension-code-block-lowlight";
+import { common, createLowlight } from "lowlight";
+import "highlight.js/styles/github-dark.css"; // pick any hljs theme
 
-import "./styles.css";
+const lowlight = createLowlight(common); // ~35 common languages
+// or: createLowlight({ js, ts, python, rust, ... }) for a smaller bundle
+
 
 // Tiptap
 import { EditorContent, useEditor } from "@tiptap/react";
@@ -240,6 +245,15 @@ import { TableKit } from "@tiptap/extension-table";
 import { Twitch } from "@tiptap/extension-twitch";
 import { Youtube } from "@tiptap/extension-youtube";
 
+import "../components/styles/response.css";
+import "../components/styles/styles.css";
+import "../components/styles/toolbar.css"
+import "../components/styles/tiptap.css";
+import "../components/styles/styles.css"
+import "../components/styles/toast.css"
+import "../components/styles/status-bar.css"
+import { loadCurrentDoc, saveCurrentDoc } from "../lib/db";
+
 // Toast UI loads only in the browser
 const Editor = dynamic(
   () => import("@toast-ui/react-editor").then((m) => m.Editor),
@@ -250,13 +264,45 @@ import { mdContent } from "./content";
 
 export default function MarkdownEditor() {
   // --- State ---
-  const [text, setText] = useState(mdContent);
+  const [text, setText] = useState("");
+  const [hydrated, setHydrated] = useState(false);
+  const [saveStatus, setSaveStatus] = useState<"saved" | "saving">("saved");
   const [cursor, setCursor] = useState({ line: 1, col: 0 });
   const [previewStats, setPreviewStats] = useState({
     chars: 0,
     words: 0,
     paragraphs: 0,
   });
+// Load the saved doc from IndexedDB on first mount.
+// Fall back to the demo content if there's nothing stored yet.
+useEffect(() => {
+  let cancelled = false;
+  loadCurrentDoc()
+    .then((stored) => {
+      if (cancelled) return;
+      setText(stored ?? mdContent);
+      setHydrated(true);
+    })
+    .catch((err) => {
+      console.error("Failed to load doc:", err);
+      setText(mdContent);
+      setHydrated(true);
+    });
+  return () => { cancelled = true; };
+}, []);
+// Debounced autosave to IndexedDB.
+// Skips the very first render (before hydration) so we don't overwrite
+// a real saved doc with an empty string.
+useEffect(() => {
+  if (!hydrated) return;
+  setSaveStatus("saving");
+  const id = setTimeout(() => {
+    saveCurrentDoc(text)
+      .then(() => setSaveStatus("saved"))
+      .catch((err) => console.error("Autosave failed:", err));
+  }, 500);
+  return () => clearTimeout(id);
+}, [text, hydrated]);
 
   // --- Refs ---
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -283,10 +329,11 @@ export default function MarkdownEditor() {
       Highlight,
       Mention,
       Mathematics,
+      CodeBlockLowlight.configure({ lowlight ,defaultLanguage: "plaintext" }),
     ],
     content: "",
     contentType: "markdown",
-    editable: false,
+    editable: true,
     immediatelyRender: false,
   });
 
@@ -302,6 +349,7 @@ export default function MarkdownEditor() {
   const handleChange = () => {
     const md = tuiRef.current?.getInstance()?.getMarkdown() ?? "";
     setText(md);
+    console.log(editor?.getHTML());
   };
 
   // --- Debounced: Toast UI text → Tiptap preview ---
@@ -310,10 +358,12 @@ export default function MarkdownEditor() {
     const id = setTimeout(() => {
       try {
         editor.commands.setContent(text, { contentType: "markdown" });
+      
       } catch {
         /* ignore */
       }
     }, 150);
+    
     return () => clearTimeout(id);
   }, [text, editor]);
 
@@ -429,6 +479,11 @@ useEffect(() => {
     el.setAttribute("autocomplete", "off");
   });
 }, [text]);
+
+  if (!hydrated) {
+    return <div className="md-demo">Loading…</div>;
+  }
+
   return (
     <div className="md-demo">
       <div className="split">
@@ -453,6 +508,7 @@ useEffect(() => {
             <span>{mdStats.words} words</span>
             <span>{mdStats.lines} lines</span>
             <span>Ln {cursor.line}, Col {cursor.col}</span>
+            <span>{saveStatus === "saving" ? "Saving…" : "Saved"}</span>
           </div>
         </div>
 

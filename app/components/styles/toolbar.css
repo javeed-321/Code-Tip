@@ -1,0 +1,144 @@
+
+/* ---------- 3. The two real scrollers ---------- */
+.md-demo .toastui-editor-md-container {
+  height: 100% !important;
+  overflow: auto !important;
+}
+
+.md-demo .tiptap-output {
+  height: 100%;
+  overflow-y: auto;
+  overflow-x: auto;
+  background: #f3f3f3;
+}
+
+
+/* ---------- 4. Toolbar (fixed at top) ---------- */
+.md-demo .toastui-editor-toolbar,
+.md-demo .toastui-editor-defaultUI-toolbar {
+
+  position: fixed;
+  top: 2px;
+  left: 0;
+  right: 0;
+  z-index: 100;
+  padding: 5px 8px;
+  background: linear-gradient(to bottom, #2f2f33, #1e1e22);
+  border: 0.5px solid black;
+  border-radius: 5px;
+  
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25);
+}
+
+.md-demo .toastui-editor-toolbar-group {
+  padding: 0 3px;
+}
+
+/* Base button: the icon is painted by a CSS mask, the colour is background-color.
+   Each .icon class below just sets --ti to a Lucide-style SVG data URI. */
+.md-demo .toastui-editor-toolbar-icons {
+  width: 30px;
+  height: 30px;
+  margin: 0 2px;
+  padding: 0;
+  border: none;
+  border-radius: 7px;
+  box-sizing: border-box;
+  cursor: pointer;
+
+  background-image: none;
+  background-color: rgba(229, 231, 235, 0.92);   /* gray-200, the resting icon colour */
+
+  -webkit-mask: var(--ti) center / 17px 17px no-repeat;
+          mask: var(--ti) center / 17px 17px no-repeat;
+
+  filter: none;
+  transition:
+    background-color 0.15s ease,
+    box-shadow 0.15s ease,
+    transform 0.08s ease;
+}
+
+.md-demo .toastui-editor-toolbar-icons:hover:not(:disabled) {
+  background-color: #ffffff;
+  transform: translateY(-1px);
+}
+
+.md-demo .toastui-editor-toolbar-icons:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.md-demo .toastui-editor-toolbar-icons:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+.md-demo .toastui-editor-toolbar-divider {
+  display: none;
+}
+
+.md-demo .toastui-editor-toolbar-icons.hrline,
+.md-demo .toastui-editor-toolbar-icons.indent,
+.md-demo .toastui-editor-toolbar-icons.outdent,
+.md-demo .toastui-editor-toolbar-icons.image,
+.md-demo .toastui-editor-toolbar-icons.code {
+  display: none;
+}
+
+.md-demo .toastui-editor-toolbar-icons.active,
+.md-demo .toastui-editor-toolbar-icons.checked,
+.md-demo .toastui-editor-toolbar-icons[aria-pressed="true"] {
+  background-color: #60a5fa;                                  /* blue-400 */
+  box-shadow: 0 0 0 1px rgba(96, 165, 250, 0.45),
+              0 0 10px rgba(96, 165, 250, 0.35);
+}
+
+/* ---------- 4b. Per-icon SVG masks (Lucide-style) ---------- */
+.md-demo .toastui-editor-toolbar-icons.heading {
+  --ti: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 12h12'/%3E%3Cpath d='M6 20V4'/%3E%3Cpath d='M18 20V4'/%3E%3C/svg%3E");
+}
+.md-demo .toastui-editor-toolbar-icons.bold {
+  --ti: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 4h8a4 4 0 0 1 4 4 4 4 0 0 1-4 4H6z'/%3E%3Cpath d='M6 12h9a4 4 0 0 1 4 4 4 4 0 0 1-4 4H6z'/%3E%3C/svg%3E");
+}
+.md-demo .toastui-editor-toolbar-icons.italic {
+  --ti: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cline x1='19' y1='4' x2='10' y2='4'/%3E%3Cline x1='14' y1='20' x2='5' y2='20'/%3E%3Cline x1='15' y1='4' x2='9' y2='20'/%3E%3C/svg%3E");
+}
+.md-demo .toastui-editor-toolbar-icons.strike {
+  --ti: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M16 4H9a3 3 0 0 0-2.83 4'/%3E%3Cpath d='M14 12a4 4 0 0 1 0 8H6'/%3E%3Cline x1='4' y1='12' x2='20' y2='12'/%3E%3C/svg%3E");
+}
+.md-demo .toastui-editor-toolbar-icons.quote {
+  --ti: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M3 21c3 0 7-1 7-8V5c0-1.25-.756-2.017-2-2H4c-1.25 0-2 .75-2 1.972V11c0 1.25.75 2 2 2 1 0 1 0 1 1v1c0 1-1 2-2 2s-1 .008-1 1.031V20c0 1 0 1 1 1z'/%3E%3Cpath d='M15 21c3 0 7-1 7-8V5c0-1.25-.757-2.017-2-2h-4c-1.25 0-2 .75-2 1.972V11c0 1.25.75 2 2 2 1 0 1 0 1 1v1c0 1-1 2-2 2s-1 .008-1 1.031V20c0 1 0 1 1 1z'/%3E%3C/svg%3E");
+}
+.md-demo .toastui-editor-toolbar-icons.bullet-list {
+  --ti: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cline x1='8' y1='6' x2='21' y2='6'/%3E%3Cline x1='8' y1='12' x2='21' y2='12'/%3E%3Cline x1='8' y1='18' x2='21' y2='18'/%3E%3Cline x1='3' y1='6' x2='3.01' y2='6'/%3E%3Cline x1='3' y1='12' x2='3.01' y2='12'/%3E%3Cline x1='3' y1='18' x2='3.01' y2='18'/%3E%3C/svg%3E");
+}
+.md-demo .toastui-editor-toolbar-icons.ordered-list {
+  --ti: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cline x1='10' y1='6' x2='21' y2='6'/%3E%3Cline x1='10' y1='12' x2='21' y2='12'/%3E%3Cline x1='10' y1='18' x2='21' y2='18'/%3E%3Cpath d='M4 6h1v4'/%3E%3Cpath d='M4 10h2'/%3E%3Cpath d='M6 18H4c0-1 2-2 2-3s-1-1.5-2-1'/%3E%3C/svg%3E");
+}
+.md-demo .toastui-editor-toolbar-icons.task-list {
+  --ti: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m3 17 2 2 4-4'/%3E%3Cpath d='m3 7 2 2 4-4'/%3E%3Cpath d='M13 6h8'/%3E%3Cpath d='M13 12h8'/%3E%3Cpath d='M13 18h8'/%3E%3C/svg%3E");
+}
+.md-demo .toastui-editor-toolbar-icons.table {
+  --ti: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='3' y='3' width='18' height='18' rx='2'/%3E%3Cline x1='3' y1='9' x2='21' y2='9'/%3E%3Cline x1='3' y1='15' x2='21' y2='15'/%3E%3Cline x1='12' y1='3' x2='12' y2='21'/%3E%3C/svg%3E");
+}
+.md-demo .toastui-editor-toolbar-icons.link {
+  --ti: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71'/%3E%3Cpath d='M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71'/%3E%3C/svg%3E");
+}
+.md-demo .toastui-editor-toolbar-icons.codeblock {
+  --ti: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='16 18 22 12 16 6'/%3E%3Cpolyline points='8 6 2 12 8 18'/%3E%3C/svg%3E");
+}
+.md-demo .toastui-editor-toolbar-icons.more {
+  --ti: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='12' cy='12' r='1'/%3E%3Ccircle cx='19' cy='12' r='1'/%3E%3Ccircle cx='5' cy='12' r='1'/%3E%3C/svg%3E");
+}
+
+.toastui-editor-md-tab-container .tab-item.active{
+  display:none;
+}
+
+.toastui-editor-defaultUI .toastui-editor-md-tab-container{
+  display:none;
+}
+.toastui-editor-md-tab-container,.toastui-editor-md-tab-container .toastui-editor-tabs
+{
+  display:none;
+}

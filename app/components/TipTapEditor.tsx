@@ -118,7 +118,7 @@ useEffect(() => {
     ],
     content: "",
     contentType: "markdown",
-    editable: true,
+    editable: false,
     immediatelyRender: false,
   });
 

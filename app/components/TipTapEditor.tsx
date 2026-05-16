@@ -253,6 +253,7 @@ import "../components/styles/styles.css"
 import "../components/styles/toast.css"
 import "../components/styles/status-bar.css"
 import { loadCurrentDoc, saveCurrentDoc } from "../lib/db";
+import { exportHtml, exportPdf } from "../lib/export";
 
 // Toast UI loads only in the browser
 const Editor = dynamic(
@@ -540,6 +541,20 @@ useEffect(() => {
             <span>{previewStats.chars} characters</span>
             <span>{previewStats.words} words</span>
             <span>{previewStats.paragraphs} paragraphs</span>
+            <button
+              type="button"
+              className="export-btn"
+              onClick={() => editor && exportHtml({ html: editor.getHTML(), title: "document" })}
+            >
+              Export HTML
+            </button>
+            <button
+              type="button"
+              className="export-btn"
+              onClick={() => editor && exportPdf({ html: editor.getHTML(), title: "document" })}
+            >
+              Export PDF
+            </button>
           </div>
         </div>
       </div>

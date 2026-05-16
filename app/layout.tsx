@@ -15,6 +15,10 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" className={lato.variable}>
+      <head>
+        <link rel="stylesheet" href="https://uicdn.toast.com/editor/latest/toastui-editor.min.css" />
+<link rel="stylesheet" href="https://uicdn.toast.com/editor/latest/theme/toastui-editor-dark.min.css" />
+      </head>
       <body>{children}</body>
     </html>
   );

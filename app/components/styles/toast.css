@@ -9,14 +9,14 @@
   border: none;
 }
 .md-demo .toastui-editor-dark{
-  background: red !important;
+  background: #1e1e1e !important;
+  height:100%dvh !important;
 }
 .md-demo .toastui-editor-md-container,
 .md-demo .toastui-editor-md-container .toastui-editor {
   width: 100% !important;
   max-width: none !important;
-  /* background: transparent; */
-  color: #1f2937;
+
 }
 
 .md-demo .toastui-editor-md-container .ProseMirror {

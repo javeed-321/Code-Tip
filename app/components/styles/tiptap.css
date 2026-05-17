@@ -115,7 +115,7 @@
    ============================================================================ */
 
 /* Container */
-.tiptap-output.tiptap-dark              { background: #1e1e22; color: #e5e7eb; }
+.tiptap-output.tiptap-dark              { background: rgb(49,49,49); color: #e5e7eb; }
 
 /* Headings */
 .tiptap-output.tiptap-dark h1           { color: #f9fafb; }

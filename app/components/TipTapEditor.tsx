@@ -202,6 +202,8 @@ useEffect(() => {
   const toggleDarkMode = () => {
     setDarkMode((prev) => {
       const next = !prev;
+          localStorage.setItem("darkMode", String(next));  // ← just add this one line
+
       const root = document.querySelector(".toastui-editor-defaultUI");
       if (root) root.classList.toggle("toastui-editor-dark", next);
       const injected = document.querySelector<HTMLButtonElement>(".dark-mode-toggle");
@@ -221,7 +223,8 @@ useEffect(() => {
         
         <div ref={leftPaneRef} className="pane">
           <div className="label">Markdown</div>
-<div className="editor-box editor-box-left" style={{ padding: 0 }}>            <Editor
+<div className="editor-box editor-box-left"   style={{ padding: 0, background: darkMode ? "#1e1e22" : "#f3f3f3" }}
+ >            <Editor
               ref={tuiRef}
               initialValue={text}
               height="auto"

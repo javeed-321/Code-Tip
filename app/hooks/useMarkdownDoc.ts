@@ -25,10 +25,8 @@ export function useMarkdownDoc(fallback: string) {
 
   // Load on first mount.
   useEffect(() => {
-    let cancelled = false;
     loadCurrentDoc()
       .then((stored) => {
-        if (cancelled) return;
         setText(stored ?? fallback);
         setHydrated(true);
       })
@@ -38,7 +36,6 @@ export function useMarkdownDoc(fallback: string) {
         setHydrated(true);
       });
     return () => {
-      cancelled = true;
     };
   }, [fallback]);
 

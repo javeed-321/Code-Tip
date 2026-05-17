@@ -1,5 +1,5 @@
 
-/* ============================================================================
+/*============================================================================ 
    Toast UI Editor (left) + Tiptap preview (right), split layout
 
    DOM:
@@ -47,14 +47,14 @@ html, body {
   display: flex;
   flex: 1;
   overflow: hidden;
-  gap: 8px;
+  gap: 3px;
 }
 
 .md-demo .pane {
   flex: 1;
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 3px;
   margin-bottom: 0px;
 }
 
@@ -66,8 +66,8 @@ html, body {
   flex: 1;
   min-height: 0;
   padding: 12px;
-  background: #fff;
-  border: 6px solid #d6d9dd;
+  background: #f3f3f3;
+  border: 1px solid #d6d9dd;
   border-radius: 10px;
   overflow: auto;           /* actual scrollbar lives one level deeper */
 }
@@ -75,4 +75,42 @@ html, body {
 
 
 
+/* --- Left scrollbar (.editor-box-left is the actual scroller) --- */
+.md-demo .editor-box-left::-webkit-scrollbar {
+  width: 8px;
+}
+.md-demo .editor-box-left::-webkit-scrollbar-track {
+  background: transparent;
+}
+.md-demo .editor-box-left::-webkit-scrollbar-thumb {
+  background: #bbb;
+  border-radius: 4px;
+}
+.md-demo .editor-box-left::-webkit-scrollbar-thumb:hover {
+  background: #999;
+}
+
+/* --- Right scrollbar --- */
+.md-demo .tiptap-output::-webkit-scrollbar {
+  width: 8px;
+}
+.md-demo .tiptap-output::-webkit-scrollbar-track {
+  background: transparent;
+}
+.md-demo .tiptap-output::-webkit-scrollbar-thumb {
+  background: #bbb;
+  border-radius: 4px;
+}
+.md-demo .tiptap-output::-webkit-scrollbar-thumb:hover {
+  background: #999;
+}
+
+/* --- Dark mode --- */
+.md-demo .editor-box:has(.toastui-editor-dark) .editor-box-left::-webkit-scrollbar-thumb
+{
+  background: #1e1e1e;
+}
+.md-demo .tiptap-output.tiptap-dark::-webkit-scrollbar-thumb {
+  background: #555;
+}
 

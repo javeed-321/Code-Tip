@@ -1,4 +1,11 @@
 "use client";
+import {
+  EditorContent, useEditor,
+  StarterKit, Markdown, Details, DetailsContent, DetailsSummary,
+  Highlight, Image, TaskItem, TaskList, Mathematics, Mention,
+  TableKit, Twitch, Youtube, CodeBlockLowlight,
+  common, createLowlight,
+} from "../components/imports/tiptap-imports";
 
 import "katex/dist/katex.min.css";
 import "@toast-ui/editor/dist/toastui-editor.css";
@@ -6,28 +13,11 @@ import "@toast-ui/editor/dist/theme/toastui-editor-dark.css";
 
 import { useState, useRef, useEffect } from "react";
 import dynamic from "next/dynamic";
-import { CodeBlockLowlight } from "@tiptap/extension-code-block-lowlight";
-import { common, createLowlight } from "lowlight";
 import "highlight.js/styles/github-dark.css"; // pick any hljs theme
-
 const lowlight = createLowlight(common); // ~35 common languages
 // or: createLowlight({ js, ts, python, rust, ... }) for a smaller bundle
 
-
 // Tiptap
-import { EditorContent, useEditor } from "@tiptap/react";
-import StarterKit from "@tiptap/starter-kit";
-import { Markdown } from "@tiptap/markdown";
-import { Details, DetailsContent, DetailsSummary } from "@tiptap/extension-details";
-import { Highlight } from "@tiptap/extension-highlight";
-import { Image } from "@tiptap/extension-image";
-import { TaskItem, TaskList } from "@tiptap/extension-list";
-import { Mathematics } from "@tiptap/extension-mathematics";
-import { Mention } from "@tiptap/extension-mention";
-import { TableKit } from "@tiptap/extension-table";
-import { Twitch } from "@tiptap/extension-twitch";
-import { Youtube } from "@tiptap/extension-youtube";
-
 import "../components/styles/response.css";
 import "../components/styles/styles.css";
 import "../components/styles/toolbar.css"
@@ -35,8 +25,9 @@ import "../components/styles/tiptap.css";
 import "../components/styles/styles.css"
 import "../components/styles/toast.css"
 import "../components/styles/status-bar.css"
-import { loadCurrentDoc, saveCurrentDoc } from "../lib/db";
 import { exportHtml, exportPdf } from "../lib/export";
+import { useMarkdownDoc } from "../hooks/useMarkdownDoc";
+import { useScrollSync } from "../hooks/useScrollSync";
 
 // Toast UI loads only in the browser
 const Editor = dynamic(
@@ -47,10 +38,10 @@ const Editor = dynamic(
 import { mdContent } from "./content";
 
 export default function MarkdownEditor() {
-  // --- State ---
-  const [text, setText] = useState("");
-  const [hydrated, setHydrated] = useState(false);
-  const [saveStatus, setSaveStatus] = useState<"saved" | "saving">("saved");
+  // --- Document state (load + autosave handled by the hook) ---
+  const { text, setText, hydrated, saveStatus } = useMarkdownDoc(mdContent);
+
+  // --- Local UI state ---
   const [cursor, setCursor] = useState({ line: 1, col: 0 });
   const [previewStats, setPreviewStats] = useState({
     chars: 0,
@@ -58,38 +49,7 @@ export default function MarkdownEditor() {
     paragraphs: 0,
   });
   const [tuiReady, setTuiReady] = useState(false);
-const [darkMode, setDarkMode] = useState(false);
-
-// Load the saved doc from IndexedDB on first mount.
-// Fall back to the demo content if there's nothing stored yet.
-useEffect(() => {
-  let cancelled = false;
-  loadCurrentDoc()
-    .then((stored) => {
-      if (cancelled) return;
-      setText(stored ?? mdContent);
-      setHydrated(true);
-    })
-    .catch((err) => {
-      console.error("Failed to load doc:", err);
-      setText(mdContent);
-      setHydrated(true);
-    });
-  return () => { cancelled = true; };
-}, []);
-// Debounced autosave to IndexedDB.
-// Skips the very first render (before hydration) so we don't overwrite
-// a real saved doc with an empty string.
-useEffect(() => {
-  if (!hydrated) return;
-  setSaveStatus("saving");
-  const id = setTimeout(() => {
-    saveCurrentDoc(text)
-      .then(() => setSaveStatus("saved"))
-      .catch((err) => console.error("Autosave failed:", err));
-  }, 100);
-  return () => clearTimeout(id);
-}, [text, hydrated]);
+  const [darkMode, setDarkMode] = useState(false);
 
   // --- Refs ---
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -105,12 +65,12 @@ useEffect(() => {
       Details, DetailsSummary, DetailsContent,
       TaskList, TaskItem.configure({ nested: true }),
       Youtube.configure({ inline: false, width: 480, height: 320 }),
-      Twitch.configure({
-        inline: false,
-        width: 480,
-        height: 320,
-        parent: typeof window !== "undefined" ? window.location.hostname : "localhost",
-      }),
+      // Twitch.configure({
+      //   inline: false,
+      //   width: 480,
+      //   height: 320,
+      //   parent: typeof window !== "undefined" ? window.location.hostname : "localhost",
+      // }),
       Image,
       TableKit,
       Highlight,
@@ -125,12 +85,15 @@ useEffect(() => {
   });
 
   // --- Derived markdown stats ---
-  const mdStats = (() => {
-    const bytes = new Blob([text]).size;
-    const words = text.trim() ? text.trim().split(/\s+/).length : 0;
-    const lines = text.split("\n").length;
-    return { bytes, words, lines };
-  })();
+ function computeMdStats(text: string) {
+  const bytes = new Blob([text]).size;
+  const words = text.trim() ? text.trim().split(/\s+/).length : 0;
+  const lines = text.split("\n").length;
+  return { bytes, words, lines };
+}
+
+const mdStats = computeMdStats(text);
+
 
   // --- Pull markdown out of Toast UI on every change ---
   const handleChange = () => {
@@ -165,11 +128,12 @@ useEffect(() => {
     try {
       const sel = inst.getSelection();
       // markdown mode: [[startLine, startCol], [endLine, endCol]]
-      if (Array.isArray(sel?.[0])) {
+      // if (Array.isArray(sel?.[0])) {
         const [line, col] = sel[0];
         setCursor({ line, col });
-      }
+      // }
     } catch {
+      console.log("Failed to get cursor position from Toast UI — probably due to timing issues with selectionchange events")
       /* ignore */
     }
   };
@@ -214,55 +178,7 @@ useEffect(() => {
   }, [editor]);
 
   // --- Synchronized proportional scrolling (left ↔ right) ---
-  useEffect(() => {
-    const leftPane = leftPaneRef.current;
-    const rightEl = rightBoxRef.current;
-    if (!leftPane) return;
-
-    let leftEl: HTMLElement | null = null;
-    let isSyncing = false;
-    let rafId = 0;
-
-    const syncLeftToRight = () => {
-      if (!leftEl || !rightEl) return;
-      if (isSyncing) { isSyncing = false; return; }
-      const leftMax = leftEl.scrollHeight - leftEl.clientHeight;
-      const rightMax = rightEl.scrollHeight - rightEl.clientHeight;
-      if (leftMax <= 0 || rightMax <= 0) return;
-      const ratio = leftEl.scrollTop / leftMax;
-      isSyncing = true;
-      rightEl.scrollTop = ratio * rightMax;
-    };
-
-    const syncRightToLeft = () => {
-      if (!leftEl || !rightEl) return;
-      if (isSyncing) { isSyncing = false; return; }
-      const leftMax = leftEl.scrollHeight - leftEl.clientHeight;
-      const rightMax = rightEl.scrollHeight - rightEl.clientHeight;
-      if (leftMax <= 0 || rightMax <= 0) return;
-      const ratio = rightEl.scrollTop / rightMax;
-      isSyncing = true;
-      leftEl.scrollTop = ratio * leftMax;
-    };
-
-    let tries = 0;
-    const attach = () => {
-  leftEl = leftPane.querySelector<HTMLElement>(".editor-box-left");
-  if (!leftEl) {
-    if (tries++ < 60) rafId = requestAnimationFrame(attach);
-    return;
-  }
-  leftEl.addEventListener("scroll", syncLeftToRight, { passive: true });
-  rightEl?.addEventListener("scroll", syncRightToLeft, { passive: true });
-};
-    attach();
-
-    return () => {
-      cancelAnimationFrame(rafId);
-      leftEl?.removeEventListener("scroll", syncLeftToRight);
-      rightEl?.removeEventListener("scroll", syncRightToLeft);
-    };
-  }, [hydrated]);
+  useScrollSync(leftPaneRef, rightBoxRef, ".editor-box-left", hydrated);
 
 useEffect(() => {
   const inst = tuiRef.current?.getInstance();

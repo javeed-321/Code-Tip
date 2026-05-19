@@ -28,6 +28,7 @@ import "../components/styles/status-bar.css"
 import { exportHtml, exportPdf } from "../lib/export";
 import { useMarkdownDoc } from "../hooks/useMarkdownDoc";
 import { useScrollSync } from "../hooks/useScrollSync";
+import Toolbar from "./Toolbar";
 
 // Toast UI loads only in the browser
 const Editor = dynamic(
@@ -65,12 +66,6 @@ export default function MarkdownEditor() {
       Details, DetailsSummary, DetailsContent,
       TaskList, TaskItem.configure({ nested: true }),
       Youtube.configure({ inline: false, width: 480, height: 320 }),
-      // Twitch.configure({
-      //   inline: false,
-      //   width: 480,
-      //   height: 320,
-      //   parent: typeof window !== "undefined" ? window.location.hostname : "localhost",
-      // }),
       Image,
       TableKit,
       Highlight,
@@ -177,6 +172,14 @@ export default function MarkdownEditor() {
     };
   }, [editor]);
 
+  // --- Apply Toast UI's dark theme when darkMode flips ---
+  // Toast UI's dark stylesheet (imported above) keys off `.toastui-editor-dark`
+  // on the root. We add/remove that class whenever React state changes.
+  useEffect(() => {
+    const root = document.querySelector(".toastui-editor-defaultUI");
+    if (root) root.classList.toggle("toastui-editor-dark", darkMode);
+  }, [darkMode, tuiReady]);
+
   // --- Synchronized proportional scrolling (left ↔ right) ---
   useScrollSync(leftPaneRef, rightBoxRef, ".editor-box-left", hydrated);
 
@@ -196,59 +199,35 @@ export default function MarkdownEditor() {
     });
   }, [text]);
 
-  // --- Toggle Toast UI dark theme on button click ---
-  // Uses the functional updater so it works correctly even when called
-  // from a click handler captured at editor-mount time.
-  const toggleDarkMode = () => {
-    setDarkMode((prev) => {
-      const next = !prev;
-      localStorage.setItem("darkMode", String(next));  // ← just add this one line
-
-      const root = document.querySelector(".toastui-editor-defaultUI");
-      if (root) root.classList.toggle("toastui-editor-dark", next);
-      const injected = document.querySelector<HTMLButtonElement>(".dark-mode-toggle");
-      if (injected) injected.textContent = next ? "Light" : "Dark";
-      return next;
-    });
-  };
-
   if (!hydrated) {
     return <div className="md-demo">Loading…</div>;
   }
-  const inject = (tries = 0) => {
-    const toolbar = document.querySelector(".toastui-editor-defaultUI-toolbar");
-    if (!toolbar) {
-      if (tries < 30) requestAnimationFrame(() => inject(tries + 1));
-      return;
-    }
-    if (toolbar.querySelector(".dark-mode-toggle")) return;
 
-    const btn = document.createElement("button");
-    btn.type = "button";
-    btn.className = "dark-mode-toggle";
-    btn.textContent = "Dark";
-    btn.style.cssText = [
-      "margin-left: auto",
-      "margin-right: 12px",
-      "margin-bottom::24px",
-      "width: 40px",
-      "height: 24px",
-      "padding: 6px 4px",
-      "border-radius: 6px",
-      "border: 1px solid #ffffff",
-      "background: #ffffff",
-      "color: #1e1e22",
-      "font-size: 13px",
-      "font-weight: 600",
-      "cursor: pointer",
-      "z-index: 9999",
-      "position: relative",
-    ].join(";");
-    btn.addEventListener("click", toggleDarkMode);
-    toolbar.appendChild(btn);
+  // Run any Toast UI command from a custom button. Focuses first so the
+  // change is applied at the editor's cursor.
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const exec = (cmd: string, payload?: Record<string, any>) => {
+    const inst = tuiRef.current?.getInstance();
+    if (!inst) return;
+    inst.focus();
+    inst.exec(cmd, payload);
   };
+
+
+
   return (
     <div className="md-demo">
+      <Toolbar
+        exec={exec}
+        darkMode={darkMode}
+        onToggleTheme={() => setDarkMode((p) => !p)}
+        onExportHtml={() =>
+          editor && exportHtml({ html: editor.getHTML(), title: "document" })
+        }
+        onExportPdf={() =>
+          editor && exportPdf({ html: editor.getHTML(), title: "document" })
+        }
+      />
       <div className="split">
         {/* Left — Toast UI markdown editor */}
 
@@ -263,15 +242,8 @@ export default function MarkdownEditor() {
               height="100%"
               minHeight="200px"
               previewStyle="tab"
-              onLoad={() => {
-                setTuiReady(true);
-
-                // Inject the dark/light toggle button into the Toast UI toolbar.
-                // Retry for a few frames in case the toolbar DOM isn't ready yet.
-
-                inject();
-              }}
-
+              onLoad={() => setTuiReady(true)}
+   
               initialEditType="markdown"
               useCommandShortcut={true}
               hideModeSwitch={true}
@@ -300,20 +272,6 @@ export default function MarkdownEditor() {
             <span>{previewStats.chars} characters</span>
             <span>{previewStats.words} words</span>
             <span>{previewStats.paragraphs} paragraphs</span>
-            <button
-              type="button"
-              className="export-btn"
-              onClick={() => editor && exportHtml({ html: editor.getHTML(), title: "document" })}
-            >
-              Export HTML
-            </button>
-            <button
-              type="button"
-              className="export-btn"
-              onClick={() => editor && exportPdf({ html: editor.getHTML(), title: "document" })}
-            >
-              Export PDF
-            </button>
           </div>
         </div>
       </div>

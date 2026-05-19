@@ -15,7 +15,6 @@ html, body {
   margin: 0;
   padding: 0;
   height: 100vh;
-  background: var(--background);
   color: var(--foreground);
   font-family: var(--font-lato), Lato, "Helvetica Neue", Helvetica, sans-serif;
   font-size: 15px;

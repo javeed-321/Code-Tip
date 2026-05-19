@@ -3,7 +3,9 @@
 .tiptap-output .ProseMirror {
   min-height: 100%;
   outline: none;
+  padding: 0px 0px 0px 12px;
   font-size: 15px;
+  margin-top: 0px;
 }
 
 .tiptap-output h1 { font-size: 1.8rem;  font-weight: 700; margin: 0.6em 0 0.3em; }

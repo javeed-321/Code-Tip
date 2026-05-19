@@ -3,14 +3,16 @@
 .md-demo .toastui-editor-defaultUI {
   border: none;
   border-radius: 0;
+  
 }
+
 
 .md-demo .toastui-editor-main {
   border: none;
 }
 .md-demo .toastui-editor-dark{
-  background: #1e1e1e !important;
-  height:100%dvh !important;
+  background: green !important;
+  height: 100vh !important;   /* replaces the invalid min-height:100%dvh */
 }
 .md-demo .toastui-editor-md-container,
 .md-demo .toastui-editor-md-container .toastui-editor {

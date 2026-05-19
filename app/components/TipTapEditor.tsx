@@ -215,27 +215,7 @@ useEffect(() => {
   if (!hydrated) {
     return <div className="md-demo">Loading…</div>;
   }
-
-  return (
-    <div className="md-demo">
-      <div className="split">
-        {/* Left — Toast UI markdown editor */}
-        
-        <div ref={leftPaneRef} className="pane">
-          <div className="label">Markdown</div>
-<div className="editor-box editor-box-left"   style={{ padding: 0, background: darkMode ? "#1e1e22" : "#f3f3f3" }}
- >            <Editor
-              ref={tuiRef}
-              initialValue={text}
-              height="auto"
-              minHeight="200px"
-              previewStyle="tab"
-              onLoad={() => {
-                setTuiReady(true);
-
-                // Inject the dark/light toggle button into the Toast UI toolbar.
-                // Retry for a few frames in case the toolbar DOM isn't ready yet.
-                const inject = (tries = 0) => {
+const inject = (tries = 0) => {
                   const toolbar = document.querySelector(".toastui-editor-defaultUI-toolbar");
                   if (!toolbar) {
                     if (tries < 30) requestAnimationFrame(() => inject(tries + 1));
@@ -266,6 +246,27 @@ useEffect(() => {
                   btn.addEventListener("click", toggleDarkMode);
                   toolbar.appendChild(btn);
                 };
+  return (
+    <div className="md-demo">
+      <div className="split">
+        {/* Left — Toast UI markdown editor */}
+        
+        <div ref={leftPaneRef} className="pane">
+          <div className="label">Markdown</div>
+<div className="editor-box editor-box-left"  
+ style={{  background: darkMode ? "#121212" : "#f3f3f3" }}
+ >            <Editor
+              ref={tuiRef}
+              initialValue={text}
+              height="100%"
+              minHeight="200px"
+              previewStyle="tab"
+              onLoad={() => {
+                setTuiReady(true);
+
+                // Inject the dark/light toggle button into the Toast UI toolbar.
+                // Retry for a few frames in case the toolbar DOM isn't ready yet.
+                
                 inject();
               }}
 

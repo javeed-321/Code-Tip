@@ -44,10 +44,10 @@
 }
 
 /* LEFT scroller — the wrapper, not Toast UI's internal element */
-.md-demo .editor-box-left {
-  overflow-y: auto;
+/* .md-demo .editor-box-left {
+  overflow-y: scroll;
   overflow-x: hidden;
-}
+} */
 
 /* Let Toast UI's content grow naturally instead of locking to 100% */
 .md-demo .toastui-editor-md-container {

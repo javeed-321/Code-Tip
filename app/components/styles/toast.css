@@ -11,7 +11,6 @@
   border: none;
 }
 .md-demo .toastui-editor-dark{
-  background: green !important;
   height: 100vh !important;   /* replaces the invalid min-height:100%dvh */
 }
 .md-demo .toastui-editor-md-container,
@@ -22,9 +21,17 @@
 }
 
 .md-demo .toastui-editor-md-container .ProseMirror {
-  padding: 16px 20px;
+  /* Mirror the right preview panel so content starts at the same level */
+  padding: 2px 30px 80px;
+  max-width: 750px;
+  margin: 0 auto;
   font-size: 15px;
   line-height: 1.7;
+  font-family: Lato, "Helvetica Neue", Helvetica, sans-serif;
+  color: rgba(0, 0, 0, 0.8);
+  font-variant-ligatures: common-ligatures;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 .md-demo .toastui-editor-md-tab-container,

@@ -9,7 +9,7 @@
   height: 100% !important;
   overflow-y: auto;
   overflow-x: auto;
-  background: #f3f3f3;
+  background: #f3f3f3;   /* StackEdit $preview-background-light */
 }
 
 
@@ -24,9 +24,9 @@
   z-index: 100;
   padding: 5px 8px;
   background: #2f2f33;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25);
   border-width : 0px 0px 1px 0px ;
   border-color: #2f2f33;
+  height:40px;
 }
 
 .md-demo .toastui-editor-toolbar-group {

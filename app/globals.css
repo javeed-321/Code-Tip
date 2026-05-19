@@ -18,4 +18,8 @@ html, body {
   background: var(--background);
   color: var(--foreground);
   font-family: var(--font-lato), Lato, "Helvetica Neue", Helvetica, sans-serif;
+  font-size: 15px;
+  font-variant-ligatures: common-ligatures;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }

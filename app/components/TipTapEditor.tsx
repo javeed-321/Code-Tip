@@ -76,7 +76,7 @@ export default function MarkdownEditor() {
       Highlight,
       Mention,
       Mathematics,
-      CodeBlockLowlight.configure({ lowlight ,defaultLanguage: "plaintext" }),
+      CodeBlockLowlight.configure({ lowlight, defaultLanguage: "plaintext" }),
     ],
     content: "",
     contentType: "markdown",
@@ -85,14 +85,14 @@ export default function MarkdownEditor() {
   });
 
   // --- Derived markdown stats ---
- function computeMdStats(text: string) {
-  const bytes = new Blob([text]).size;
-  const words = text.trim() ? text.trim().split(/\s+/).length : 0;
-  const lines = text.split("\n").length;
-  return { bytes, words, lines };
-}
+  function computeMdStats(text: string) {
+    const bytes = new Blob([text]).size;
+    const words = text.trim() ? text.trim().split(/\s+/).length : 0;
+    const lines = text.split("\n").length;
+    return { bytes, words, lines };
+  }
 
-const mdStats = computeMdStats(text);
+  const mdStats = computeMdStats(text);
 
 
   // --- Pull markdown out of Toast UI on every change ---
@@ -108,53 +108,53 @@ const mdStats = computeMdStats(text);
     const id = setTimeout(() => {
       try {
         editor.commands.setContent(text, { contentType: "markdown" });
-      
+
       } catch {
         /* ignore */
         console.log("Failed to set Tiptap content — probably invalid markdown:", { text });
       }
     }, 25);
-    
+
     return () => clearTimeout(id);
   }, [text, editor]);
 
   // --- Toast UI caret → Ln/Col  ---
-useEffect(() => {
-  if (!tuiReady) return;
-  const inst = tuiRef.current?.getInstance();
-  if (!inst) return;
+  useEffect(() => {
+    if (!tuiReady) return;
+    const inst = tuiRef.current?.getInstance();
+    if (!inst) return;
 
-  const updateCursor = () => {
-    try {
-      const sel = inst.getSelection();
-      // markdown mode: [[startLine, startCol], [endLine, endCol]]
-      // if (Array.isArray(sel?.[0])) {
+    const updateCursor = () => {
+      try {
+        const sel = inst.getSelection();
+        // markdown mode: [[startLine, startCol], [endLine, endCol]]
+        // if (Array.isArray(sel?.[0])) {
         const [line, col] = sel[0];
         setCursor({ line, col });
-      // }
-    } catch {
-      console.log("Failed to get cursor position from Toast UI — probably due to timing issues with selectionchange events")
-      /* ignore */
-    }
-  };
+        // }
+      } catch {
+        console.log("Failed to get cursor position from Toast UI — probably due to timing issues with selectionchange events")
+        /* ignore */
+      }
+    };
 
-  // Toast UI's own events (work for typing, not always for clicks/arrows)
-  inst.on("caretChange", updateCursor);
-  inst.on("focus", updateCursor);
-  inst.on("change", updateCursor);
+    // Toast UI's own events (work for typing, not always for clicks/arrows)
+    inst.on("caretChange", updateCursor);
+    inst.on("focus", updateCursor);
+    inst.on("change", updateCursor);
 
-  // Native event — fires reliably on every cursor move
-  document.addEventListener("selectionchange", updateCursor);
+    // Native event — fires reliably on every cursor move
+    document.addEventListener("selectionchange", updateCursor);
 
-  updateCursor();
+    updateCursor();
 
-  return () => {
-    inst.off("caretChange", updateCursor);
-    inst.off("focus", updateCursor);
-    inst.off("change", updateCursor);
-    document.removeEventListener("selectionchange", updateCursor);
-  };
-}, [tuiReady]);
+    return () => {
+      inst.off("caretChange", updateCursor);
+      inst.off("focus", updateCursor);
+      inst.off("change", updateCursor);
+      document.removeEventListener("selectionchange", updateCursor);
+    };
+  }, [tuiReady]);
 
 
   // --- Tiptap content → preview stats ---
@@ -180,21 +180,21 @@ useEffect(() => {
   // --- Synchronized proportional scrolling (left ↔ right) ---
   useScrollSync(leftPaneRef, rightBoxRef, ".editor-box-left", hydrated);
 
-useEffect(() => {
-  const inst = tuiRef.current?.getInstance();
-  if (!inst) return;
+  useEffect(() => {
+    const inst = tuiRef.current?.getInstance();
+    if (!inst) return;
 
-  // Find the ProseMirror editing surfaces (both markdown and wysiwyg) and disable spellcheck
-  const editors = document.querySelectorAll<HTMLElement>(
-    ".toastui-editor .ProseMirror"
-  );
-  editors.forEach((el) => {
-    el.setAttribute("spellcheck", "false");
-    el.setAttribute("autocorrect", "off");
-    el.setAttribute("autocapitalize", "off");
-    el.setAttribute("autocomplete", "off");
-  });
-}, [text]);
+    // Find the ProseMirror editing surfaces (both markdown and wysiwyg) and disable spellcheck
+    const editors = document.querySelectorAll<HTMLElement>(
+      ".toastui-editor .ProseMirror"
+    );
+    editors.forEach((el) => {
+      el.setAttribute("spellcheck", "false");
+      el.setAttribute("autocorrect", "off");
+      el.setAttribute("autocapitalize", "off");
+      el.setAttribute("autocomplete", "off");
+    });
+  }, [text]);
 
   // --- Toggle Toast UI dark theme on button click ---
   // Uses the functional updater so it works correctly even when called
@@ -202,7 +202,7 @@ useEffect(() => {
   const toggleDarkMode = () => {
     setDarkMode((prev) => {
       const next = !prev;
-          localStorage.setItem("darkMode", String(next));  // ← just add this one line
+      localStorage.setItem("darkMode", String(next));  // ← just add this one line
 
       const root = document.querySelector(".toastui-editor-defaultUI");
       if (root) root.classList.toggle("toastui-editor-dark", next);
@@ -215,47 +215,49 @@ useEffect(() => {
   if (!hydrated) {
     return <div className="md-demo">Loading…</div>;
   }
-const inject = (tries = 0) => {
-                  const toolbar = document.querySelector(".toastui-editor-defaultUI-toolbar");
-                  if (!toolbar) {
-                    if (tries < 30) requestAnimationFrame(() => inject(tries + 1));
-                    return;
-                  }
-                  if (toolbar.querySelector(".dark-mode-toggle")) return;
+  const inject = (tries = 0) => {
+    const toolbar = document.querySelector(".toastui-editor-defaultUI-toolbar");
+    if (!toolbar) {
+      if (tries < 30) requestAnimationFrame(() => inject(tries + 1));
+      return;
+    }
+    if (toolbar.querySelector(".dark-mode-toggle")) return;
 
-                  const btn = document.createElement("button");
-                  btn.type = "button";
-                  btn.className = "dark-mode-toggle";
-                  btn.textContent = "Dark";
-                  btn.style.cssText = [
-                    "margin-left: auto",
-                    "margin-right: 12px",
-                    "margin-bottom::24px",
-                    "width: 60px",
-                    "padding: 6px 4px",
-                    "border-radius: 6px",
-                    "border: 1px solid #ffffff",
-                    "background: #ffffff",
-                    "color: #1e1e22",
-                    "font-size: 13px",
-                    "font-weight: 600",
-                    "cursor: pointer",
-                    "z-index: 9999",
-                    "position: relative",
-                  ].join(";");
-                  btn.addEventListener("click", toggleDarkMode);
-                  toolbar.appendChild(btn);
-                };
+    const btn = document.createElement("button");
+    btn.type = "button";
+    btn.className = "dark-mode-toggle";
+    btn.textContent = "Dark";
+    btn.style.cssText = [
+      "margin-left: auto",
+      "margin-right: 12px",
+      "margin-bottom::24px",
+      "width: 40px",
+      "height: 24px",
+      "padding: 6px 4px",
+      "border-radius: 6px",
+      "border: 1px solid #ffffff",
+      "background: #ffffff",
+      "color: #1e1e22",
+      "font-size: 13px",
+      "font-weight: 600",
+      "cursor: pointer",
+      "z-index: 9999",
+      "position: relative",
+    ].join(";");
+    btn.addEventListener("click", toggleDarkMode);
+    toolbar.appendChild(btn);
+  };
   return (
     <div className="md-demo">
       <div className="split">
         {/* Left — Toast UI markdown editor */}
-        
-        <div ref={leftPaneRef} className="pane">
-          <div className="label">Markdown</div>
-<div className="editor-box editor-box-left"  
- style={{  background: darkMode ? "#121212" : "#f3f3f3" }}
- >            <Editor
+
+        <div ref={leftPaneRef} className={`pane ${darkMode ? "pane-dark" : ""}`}>
+          <div className="label">Source</div>
+          <div className="editor-box editor-box-left"
+            style={{ background: darkMode ? "#121212" : "#f8f8fc" }}
+          >
+            <Editor
               ref={tuiRef}
               initialValue={text}
               height="100%"
@@ -266,7 +268,7 @@ const inject = (tries = 0) => {
 
                 // Inject the dark/light toggle button into the Toast UI toolbar.
                 // Retry for a few frames in case the toolbar DOM isn't ready yet.
-                
+
                 inject();
               }}
 
@@ -276,7 +278,7 @@ const inject = (tries = 0) => {
               onChange={handleChange}
             />
           </div>
-          
+
           <div className={`status-bar ${darkMode ? "status-bar-darkmode" : ""}`}>
             <span>Markdown</span>
             <span>{mdStats.bytes} bytes</span>
@@ -289,9 +291,8 @@ const inject = (tries = 0) => {
 
         {/* Right — Tiptap rendered preview */}
         <div className="pane">
-          <div className="label">Preview</div>
-          <div ref={rightBoxRef}   className={`editor-box tiptap-output ${darkMode ? "tiptap-dark" : ""}`}
->
+          <div ref={rightBoxRef} className={`editor-box tiptap-output ${darkMode ? "tiptap-dark" : ""}`}
+          >
             {editor && <EditorContent editor={editor} />}
           </div>
           <div className={`status-bar ${darkMode ? "status-bar-darkmode" : ""}`}>

@@ -36,7 +36,7 @@ html, body {
   height: 100dvh;
   box-sizing:border-box;
   padding: 0;
-  padding-top: 46px;          /* reserves space for fixed toolbar */
+  padding-top: 40.3px;          /* reserves space for fixed toolbar */
   overflow: hidden;
 
   font-family: var(--font-lato), Lato, "Helvetica Neue", Helvetica, sans-serif;
@@ -65,17 +65,14 @@ html, body {
 .md-demo .editor-box {
   flex: 1;
   min-height: 0;
-  padding: 12px;
-  overflow:auto;  
   padding: 0;
+  overflow: auto;
 }
 
-.md-demo .editor-box-left{
-  padding: 6px 0px 0px 0px   ;
-  border-right:1px  ;
-  border-style: solid;
-  border-color: black;
-
+.md-demo .editor-box-left {
+  padding: 0;
+  border-right: 1px solid #e5e7eb;
+  background: #fff !important;  /* override inline dark/light style on light mode */
 }
 
 
@@ -108,3 +105,11 @@ html, body {
 }
 
 /* --- Dark mode --- */
+.md-demo .pane-dark .editor-box-left {
+  background: #121212 !important;
+  border-right-color: #2d2d2d;
+}
+
+.md-demo .pane-dark .toastui-editor-md-container .ProseMirror {
+  color: rgba(255, 255, 255, 0.8);
+}

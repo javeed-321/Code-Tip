@@ -1,76 +1,209 @@
 
-/* ---------- 6. Tiptap preview typography ---------- */
+/* ============================================================================
+   Tiptap preview typography
+   Reference: StackEdit variables.scss + base.scss
+   line-height-base: 1.67  |  line-height-title: 1.33
+   font-size-monospace: 0.85em  |  heading margins: 1.8em 0
+   ============================================================================ */
+
+/* ---------- Container ---------- */
 .tiptap-output .ProseMirror {
   min-height: 100%;
   outline: none;
-  padding: 0px 0px 0px 12px;
+  padding: 0px 30px 80px !important;
+  max-width: 750px;
+  margin: 0 auto;
   font-size: 15px;
-  margin-top: 0px;
+  line-height: 1.7;
+  color: rgba(0, 0, 0, 0.75);
+  font-family: Lato, "Helvetica Neue", Helvetica, sans-serif;
+  font-variant-ligatures: common-ligatures;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
-.tiptap-output h1 { font-size: 1.8rem;  font-weight: 700; margin: 0.6em 0 0.3em; }
-.tiptap-output h2 { font-size: 1.4rem;  font-weight: 700; margin: 0.6em 0 0.3em; }
-.tiptap-output h3 { font-size: 1.15rem; font-weight: 600; margin: 0.5em 0 0.3em; }
-.tiptap-output p  { margin: 0.5em 0; line-height: 1.6; }
+/* Collapse first-child top margin so content sits flush at top */
+.tiptap-output .ProseMirror > *:first-child { margin-top: 0; }
+
+/* ---------- Headings ---------- */
+.tiptap-output h1,
+.tiptap-output h2,
+.tiptap-output h3,
+.tiptap-output h4,
+.tiptap-output h5,
+.tiptap-output h6 {
+  margin: 1.8em 0 0.6em;
+  line-height: 1.33;
+  font-weight: 600;
+  color: rgba(0, 0, 0, 0.85);
+}
+
+.tiptap-output h1 { font-size: 2em;    font-weight: 700; }
+.tiptap-output h2 { font-size: 1.5em;  font-weight: 700; }
+.tiptap-output h3 { font-size: 1.17em; font-weight: 600; }
+.tiptap-output h4 { font-size: 1em;    font-weight: 600; }
+.tiptap-output h5 { font-size: 0.83em; font-weight: 600; }
+.tiptap-output h6 { font-size: 0.75em; font-weight: 600; }
+
+/* h1 + h2 bottom rule — matches StackEdit */
+.tiptap-output h1::after,
+.tiptap-output h2::after {
+  content: '';
+  display: block;
+  position: relative;
+  top: 0.4em;
+  border-bottom: 1px solid rgba(128, 128, 128, 0.25);
+}
+
+/* ---------- Body text ---------- */
+.tiptap-output p { margin: 1.2em 0; line-height: 1.7; }
+
 .tiptap-output strong { font-weight: 700; }
 .tiptap-output em     { font-style: italic; }
-.tiptap-output a { color: #2563eb; text-decoration: underline; }
 
+/* ---------- Links ---------- */
+.tiptap-output a {
+  color: #0c93e4;
+  text-decoration: underline;
+  text-decoration-skip-ink: auto;
+}
+.tiptap-output a:hover,
+.tiptap-output a:focus { text-decoration: none; }
+
+/* ---------- Lists ---------- */
 .tiptap-output ul,
-.tiptap-output ol { margin: 0.5em 0; padding-left: 1.5em; }
-.tiptap-output ul { list-style: disc; }
-.tiptap-output ol { list-style: decimal; }
+.tiptap-output ol { margin: 1.2em 0; padding-left: 1.8em; }
+.tiptap-output ul  { list-style: disc; }
+.tiptap-output ol  { list-style: decimal; }
 
+.tiptap-output ol ul li p {line-height: 0.3 !important;color:red !important; }
+
+/* Nested lists collapse margin */
+.tiptap-output ol ul,
+.tiptap-output ul ol,
+.tiptap-output ul ul,
+.tiptap-output ol ol { margin: 0; }
+
+.tiptap-output li { line-height: 1 !important; }
+
+/* Task list */
 .tiptap-output ul[data-type="taskList"] { list-style: none; padding-left: 0; }
-.tiptap-output ul[data-type="taskList"] li { display: flex; align-items: flex-start; gap: 8px; }
+.tiptap-output ul[data-type="taskList"] li { display: flex; align-items: flex-start; gap: 8px; margin: 0.3em 0; }
 .tiptap-output ul[data-type="taskList"] li > label { flex-shrink: 0; margin-top: 4px; }
 .tiptap-output ul[data-type="taskList"] li > div   { flex: 1; }
 
+/* ---------- Blockquote ---------- */
 .tiptap-output blockquote {
-  margin: 0.5em 0;
-  padding: 0.2em 0.8em;
-  border-left: 3px solid #d1d5db;
-  color: #4b5563;
+  margin: 1.2em 0;
+  padding-left: 1.5em;
+  border-left: 5px solid rgba(0, 0, 0, 0.1);
+  color: rgba(0, 0, 0, 0.5);
+  font-style: italic;
 }
 
+/* ---------- Horizontal rule ---------- */
+.tiptap-output hr {
+  border: 0;
+  border-top: 1px solid rgba(128, 128, 128, 0.33);
+  margin: 2em 0;
+}
+
+/* ---------- Code (inline) ---------- */
+.tiptap-output code {
+  font-family: 'Roboto Mono', 'Lucida Sans Typewriter', 'Lucida Console', monaco, Courier, monospace;
+  font-size: 0.85em;
+  background: rgba(0, 0, 0, 0.05);
+  border-radius: 3px;
+  padding: 2px 5px;
+}
+
+/* ---------- Code block (pre) ---------- */
 .tiptap-output pre {
-  margin: 0.8em 0;
-  padding: 14px 16px;
-  background: #f6f8fa;          /* soft light grey, not stark white */
-  color: #1f2328;               /* near-black default text */
+  margin: 1.2em 0;
+  padding: 1em 1.2em;
+  background: #f6f8fa;
+  color: #1f2328;
   border: 1px solid #d0d7de;
-  border-radius: 8px;
+  border-radius: 6px;
   overflow-x: auto;
-  font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
-  font-size: 0.9rem;
-  line-height: 1.6;
+  font-family: 'Roboto Mono', 'Lucida Sans Typewriter', 'Lucida Console', monaco, Courier, monospace;
+  font-size: 0.85em;
+  line-height: 1.55;
+  -webkit-text-size-adjust: none;
 }
 
 .tiptap-output pre code {
   background: none;
   padding: 0;
+  border-radius: 0;
+  font-size: inherit;
   color: inherit;
 }
 
-/* darker, high-contrast syntax colors for a light background */
-.tiptap-output .hljs-keyword,
-.tiptap-output .hljs-built_in   { color: #cf222e; }   /* import, from, const */
-.tiptap-output .hljs-string     { color: #0a3069; }   /* '@tiptap/core' */
-.tiptap-output .hljs-title,
-.tiptap-output .hljs-class,
-.tiptap-output .hljs-function   { color: #6639ba; }   /* Editor, StarterKit */
-.tiptap-output .hljs-comment    { color: #6e7781; font-style: italic; }
+/* Syntax highlighting — StackEdit Prism palette (prism.scss) */
+.tiptap-output .hljs-comment,
+.tiptap-output .hljs-quote              { color: #708090; font-style: italic; }   /* prism: comment/cdata */
+
+.tiptap-output .hljs-punctuation        { color: #999; }                          /* prism: punctuation */
+
 .tiptap-output .hljs-number,
-.tiptap-output .hljs-literal    { color: #0550ae; }
-.tiptap-output .hljs-attr,
-.tiptap-output .hljs-variable   { color: #1f2328; }
-.tiptap-output img { max-width: 100%; margin: 0.5em 0; border-radius: 4px; }
+.tiptap-output .hljs-literal,
+.tiptap-output .hljs-boolean,
+.tiptap-output .hljs-built_in,
+.tiptap-output .hljs-symbol,
+.tiptap-output .hljs-deletion           { color: #905; }                          /* prism: property/number/boolean/tag */
 
-.tiptap-output table { width: 100%; margin: 0.5em 0; border-collapse: collapse; }
+.tiptap-output .hljs-string,
+.tiptap-output .hljs-selector-attr,
+.tiptap-output .hljs-selector-pseudo,
+.tiptap-output .hljs-addition           { color: #690; }                          /* prism: string/selector/attr-name/inserted */
+
+.tiptap-output .hljs-operator,
+.tiptap-output .hljs-link               { color: #a67f59; }                       /* prism: operator/entity/url */
+
+.tiptap-output .hljs-keyword,
+.tiptap-output .hljs-selector-tag,
+.tiptap-output .hljs-attr               { color: #07a; }                          /* prism: keyword/atrule/attr-value */
+
+.tiptap-output .hljs-title,
+.tiptap-output .hljs-class .hljs-title,
+.tiptap-output .hljs-section,
+.tiptap-output .hljs-function           { color: #dd4a68; }                       /* prism: function */
+
+.tiptap-output .hljs-variable,
+.tiptap-output .hljs-template-variable,
+.tiptap-output .hljs-regexp             { color: #e90; }                          /* prism: variable/regex/important */
+
+/* ---------- Images ---------- */
+.tiptap-output img { max-width: 100%; margin: 1em 0; border-radius: 4px; }
+
+/* ---------- Tables ---------- */
+.tiptap-output table {
+  width: 100%;
+  margin: 1.2em 0;
+  border-collapse: collapse;
+  border-spacing: 0;
+  font-size: 0.95em;
+}
 .tiptap-output table td,
-.tiptap-output table th { padding: 6px 10px; border: 1px solid #d1d5db; }
-.tiptap-output table th { background: #f9fafb; font-weight: 600; }
+.tiptap-output table th {
+  padding: 8px 12px;
+  border-right: 1px solid #dcdcdc;
+}
+.tiptap-output table td:last-child,
+.tiptap-output table th:last-child { border-right: 0; }
+.tiptap-output table td  { border-top: 1px solid #dcdcdc; }
+.tiptap-output table th  { background: #f9fafb; font-weight: 600; text-align: left; }
 
+/* ---------- Mark / Highlight ---------- */
+.tiptap-output mark {
+  background: #f8f840;
+  color: rgba(0, 0, 0, 0.8);
+  border-radius: 2px;
+  padding: 0 2px;
+}
+
+/* ---------- Mention ---------- */
 .tiptap-output .mention {
   padding: 2px 6px;
   background: #e0e7ff;
@@ -79,83 +212,113 @@
   font-weight: 500;
 }
 
+/* ---------- Block math ---------- */
 .tiptap-output [data-type="block-math"] {
-  margin: 1rem 0;
-  padding: 0.5rem;
+  margin: 1.2em 0;
+  padding: 0.75em 1em;
   background: #f8fafc;
   border-radius: 4px;
   text-align: center;
+  border: 1px solid rgba(0, 0, 0, 0.07);
 }
 
+/* ---------- Iframe ---------- */
 .tiptap-output iframe {
   max-width: 100%;
-  margin: 0.5em 0;
+  margin: 1em 0;
   border: none;
   border-radius: 6px;
 }
 
+/* ---------- Details / Summary ---------- */
 .tiptap-output details {
-  margin: 0.5em 0;
-  padding: 8px 12px;
+  margin: 1.2em 0;
+  padding: 0.75em 1em;
   border: 1px solid #e5e7eb;
   border-radius: 6px;
 }
-.tiptap-output details summary { cursor: pointer; font-weight: 600; }
+.tiptap-output details summary {
+  cursor: pointer;
+  font-weight: 600;
+  user-select: none;
+}
 
-.tiptap-output mark {
-  padding: 0 2px;
-  background: #fef08a;
-  border-radius: 2px;
+/* ---------- Keyboard shortcuts ---------- */
+.tiptap-output kbd {
+  font-family: Lato, "Helvetica Neue", Helvetica, sans-serif;
+  background: #fff;
+  border: 1px solid rgba(63, 63, 63, 0.25);
+  border-radius: 3px;
+  box-shadow: 0 1px 0 rgba(63, 63, 63, 0.25);
+  color: #333;
+  display: inline-block;
+  font-size: 0.8em;
+  margin: 0 0.1em;
+  padding: 0.1em 0.6em;
+  white-space: nowrap;
 }
 
 
-
-
 /* ============================================================================
-   Dark mode — only applies when .tiptap-output ALSO has .tiptap-dark
-   Each component gets its own text-color rule, not inherited.
+   Dark mode — .tiptap-output.tiptap-dark
    ============================================================================ */
 
-/* Container */
-.tiptap-output.tiptap-dark              { background: rgb(49,49,49); color: #e5e7eb; }
+.tiptap-output.tiptap-dark .ProseMirror {
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.tiptap-output.tiptap-dark              { background: rgb(30, 30, 30); color: rgba(255, 255, 255, 0.8); }
 
 /* Headings */
-.tiptap-output.tiptap-dark h1           { color: #f9fafb; }
-.tiptap-output.tiptap-dark h2           { color: #f3f4f6; }
-.tiptap-output.tiptap-dark h3           { color: #e5e7eb; }
+.tiptap-output.tiptap-dark h1,
+.tiptap-output.tiptap-dark h2,
+.tiptap-output.tiptap-dark h3,
+.tiptap-output.tiptap-dark h4,
+.tiptap-output.tiptap-dark h5,
+.tiptap-output.tiptap-dark h6 { color: rgba(255, 255, 255, 0.9); }
 
-/* Body text */
-.tiptap-output.tiptap-dark p            { color: #e5e7eb; }
-.tiptap-output.tiptap-dark strong       { color: #ffffff; }
-.tiptap-output.tiptap-dark em           { color: #e5e7eb; }
+.tiptap-output.tiptap-dark h1::after,
+.tiptap-output.tiptap-dark h2::after { border-bottom-color: rgba(255, 255, 255, 0.12); }
+
+/* Body */
+.tiptap-output.tiptap-dark p  { color: rgba(255, 255, 255, 0.8); }
+.tiptap-output.tiptap-dark strong { color: #fff; }
+.tiptap-output.tiptap-dark em     { color: rgba(255, 255, 255, 0.8); }
 
 /* Links */
-.tiptap-output.tiptap-dark a            { color: #60a5fa; }
+.tiptap-output.tiptap-dark a  { color: #60a5fa; }
 
 /* Lists */
 .tiptap-output.tiptap-dark ul,
-.tiptap-output.tiptap-dark ol           { color: #e5e7eb; }
-.tiptap-output.tiptap-dark li           { color: #e5e7eb; }
-
-/* Task list */
-.tiptap-output.tiptap-dark ul[data-type="taskList"] li > label { color: #e5e7eb; }
-.tiptap-output.tiptap-dark ul[data-type="taskList"] li > div   { color: #e5e7eb; }
+.tiptap-output.tiptap-dark ol,
+.tiptap-output.tiptap-dark li { color: rgba(255, 255, 255, 0.8); }
+.tiptap-output.tiptap-dark ul[data-type="taskList"] li > label,
+.tiptap-output.tiptap-dark ul[data-type="taskList"] li > div { color: rgba(255, 255, 255, 0.8); }
 
 /* Blockquote */
-.tiptap-output.tiptap-dark blockquote   { color: #9ca3af; border-left-color: #4b5563; }
+.tiptap-output.tiptap-dark blockquote {
+  color: rgba(255, 255, 255, 0.45);
+  border-left-color: rgba(255, 255, 255, 0.12);
+}
 
-/* Code block (pre) */
-.tiptap-output.tiptap-dark pre          { background: #2d333b; color: #e5e7eb; border-color: #4b5563; }
-.tiptap-output.tiptap-dark pre code     { color: #e5e7eb; }
+/* HR */
+.tiptap-output.tiptap-dark hr { border-top-color: rgba(255, 255, 255, 0.15); }
 
-/* Syntax highlighting — brighter, dark-bg-friendly colors */
+/* Inline code */
+.tiptap-output.tiptap-dark code { background: rgba(255, 255, 255, 0.08); color: #e5e7eb; }
+
+/* Code block */
+.tiptap-output.tiptap-dark pre { background: #2d333b; color: #e5e7eb; border-color: #4b5563; }
+.tiptap-output.tiptap-dark pre code { color: #e5e7eb; background: none; }
+
+/* Syntax — brighter, dark-bg-friendly */
 .tiptap-output.tiptap-dark .hljs-keyword,
-.tiptap-output.tiptap-dark .hljs-built_in   { color: #ff7b72; }   /* import, from, const */
-.tiptap-output.tiptap-dark .hljs-string     { color: #a5d6ff; }   /* '@tiptap/core'      */
+.tiptap-output.tiptap-dark .hljs-built_in   { color: #ff7b72; }
+.tiptap-output.tiptap-dark .hljs-string     { color: #a5d6ff; }
 .tiptap-output.tiptap-dark .hljs-title,
 .tiptap-output.tiptap-dark .hljs-class,
-.tiptap-output.tiptap-dark .hljs-function   { color: #d2a8ff; }   /* Editor, StarterKit  */
-.tiptap-output.tiptap-dark .hljs-comment    { color: #8b949e; }   /* // comment          */
+.tiptap-output.tiptap-dark .hljs-function   { color: #d2a8ff; }
+.tiptap-output.tiptap-dark .hljs-comment    { color: #8b949e; }
 .tiptap-output.tiptap-dark .hljs-number,
 .tiptap-output.tiptap-dark .hljs-literal    { color: #79c0ff; }
 .tiptap-output.tiptap-dark .hljs-attr,
@@ -163,18 +326,26 @@
 
 /* Tables */
 .tiptap-output.tiptap-dark table td,
-.tiptap-output.tiptap-dark table th         { color: #e5e7eb; border-color: #4b5563; }
-.tiptap-output.tiptap-dark table th         { background: #2d333b; color: #f9fafb; }
+.tiptap-output.tiptap-dark table th { color: #e5e7eb; border-color: #4b5563; }
+.tiptap-output.tiptap-dark table th { background: #2d333b; color: #f9fafb; }
 
-/* Mention pill */
-.tiptap-output.tiptap-dark .mention         { background: #312e81; color: #c7d2fe; }
+/* Mention */
+.tiptap-output.tiptap-dark .mention { background: #312e81; color: #c7d2fe; }
 
 /* Block math */
-.tiptap-output.tiptap-dark [data-type="block-math"] { background: #2d333b; color: #e5e7eb; }
+.tiptap-output.tiptap-dark [data-type="block-math"] { background: #2d333b; color: #e5e7eb; border-color: #4b5563; }
 
-/* Details / Summary */
-.tiptap-output.tiptap-dark details          { border-color: #4b5563; color: #e5e7eb; }
-.tiptap-output.tiptap-dark details summary  { color: #f3f4f6; }
+/* Details */
+.tiptap-output.tiptap-dark details       { border-color: #4b5563; color: rgba(255, 255, 255, 0.8); }
+.tiptap-output.tiptap-dark details summary { color: #f3f4f6; }
 
-/* Highlight (mark) */
-.tiptap-output.tiptap-dark mark             { background: #b45309; color: #fff; }
+/* Mark */
+.tiptap-output.tiptap-dark mark { background: #b45309; color: #fff; }
+
+/* Kbd */
+.tiptap-output.tiptap-dark kbd {
+  background: #2d333b;
+  border-color: #4b5563;
+  box-shadow: 0 1px 0 #4b5563;
+  color: #e5e7eb;
+}

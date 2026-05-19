@@ -1,4 +1,4 @@
-import MarkdownEditor from "./components/TipTapEditor";
+import MarkdownEditor from "./features/markdown-editor/MarkdownEditor";
 import { Lato } from "next/font/google";
 
 const lato = Lato({

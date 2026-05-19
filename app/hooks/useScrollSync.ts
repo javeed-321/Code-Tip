@@ -15,10 +15,8 @@ export function useScrollSync(
     const right = rightElRef.current;
     if (!container || !right) return;
 
-    let left: HTMLElement | null = null;
     let syncing = false;
 
-    // Scroll source to the same proportional position on target
     const sync = (source: HTMLElement, target: HTMLElement) => {
       if (syncing) { syncing = false; return; }
       const sourceMax = source.scrollHeight - source.clientHeight;
@@ -28,27 +26,18 @@ export function useScrollSync(
       target.scrollTop = (source.scrollTop / sourceMax) * targetMax;
     };
 
-    const onLeftScroll  = () => left && sync(left, right);
-    const onRightScroll = () => left && sync(right, left);
+    // Wait for Toast UI to render its inner scroller
+    const timer = setTimeout(() => {
+      const left = container.querySelector<HTMLElement>(leftSelector);
+      if (!left) return;
 
-    // Toast UI builds its inner scroller asynchronously — retry until found
-    let tries = 0;
-    let rafId = 0;
-    const attach = () => {
-      left = container.querySelector<HTMLElement>(leftSelector);
-      if (!left) {
-        if (tries++ < 60) rafId = requestAnimationFrame(attach);
-        return;
-      }
+      const onLeftScroll = () => sync(left, right);
+      const onRightScroll = () => sync(right, left);
+
       left.addEventListener("scroll", onLeftScroll);
       right.addEventListener("scroll", onRightScroll);
-    };
-    attach();
+    }, 500);
 
-    return () => {
-      cancelAnimationFrame(rafId);
-      left?.removeEventListener("scroll", onLeftScroll);
-      right.removeEventListener("scroll", onRightScroll);
-    };
+    return () => clearTimeout(timer);
   }, [leftContainerRef, rightElRef, leftSelector, enabled]);
 }

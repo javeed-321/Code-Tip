@@ -17,7 +17,8 @@ export type SaveStatus = "saved" | "saving";
  *   - setText:    update the document
  *   - hydrated:   true once the initial load has completed
  *   - saveStatus: "saving" while a write is pending, "saved" otherwise
- */
+*/
+
 export function useMarkdownDoc(fallback: string) {
   const [text, setText] = useState("");
   const [hydrated, setHydrated] = useState(false);
@@ -25,30 +26,36 @@ export function useMarkdownDoc(fallback: string) {
 
   // Load on first mount.
   useEffect(() => {
-    loadCurrentDoc()
-      .then((stored) => {
+    const load = async () => {
+      try {
+        const stored = await loadCurrentDoc();
         setText(stored ?? fallback);
-        setHydrated(true);
-      })
-      .catch((err) => {
+      } catch (err) {
         console.error("Failed to load doc:", err);
         setText(fallback);
+      } finally {
         setHydrated(true);
-      });
-    return () => {
+      }
     };
+
+    load();
   }, [fallback]);
 
-  // Debounced autosave. Skips the very first render so we don't overwrite
-  // a real saved doc with an empty string before hydration completes.
+  // Debounced autosave.
   useEffect(() => {
     if (!hydrated) return;
     setSaveStatus("saving");
-    const id = setTimeout(() => {
-      saveCurrentDoc(text)
-        .then(() => setSaveStatus("saved"))
-        .catch((err) => console.error("Autosave failed:", err));
+
+    const id = setTimeout(async () => {
+      try {
+        await saveCurrentDoc(text);
+        setSaveStatus("saved");
+      } catch (err) {
+        console.error("Autosave failed:", err);
+        setSaveStatus("saved");
+      }
     }, AUTOSAVE_DEBOUNCE_MS);
+
     return () => clearTimeout(id);
   }, [text, hydrated]);
 

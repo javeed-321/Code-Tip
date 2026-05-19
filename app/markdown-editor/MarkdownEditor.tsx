@@ -17,9 +17,9 @@ import "./styles/status-bar.css";
 import { useState, useRef, useEffect } from "react";
 
 // App-wide
-import { exportHtml, exportPdf } from "../../lib/export";
-import { useMarkdownDoc } from "../../hooks/useMarkdownDoc";
-import { useScrollSync } from "../../hooks/useScrollSync";
+import { exportHtml, exportPdf } from "./lib/export";
+import { useMarkdownDoc } from "./hooks/useMarkdownDoc";
+import { useScrollSync } from "./hooks/useScrollSync";
 
 // Feature-local
 import Toolbar from "./components/Toolbar";

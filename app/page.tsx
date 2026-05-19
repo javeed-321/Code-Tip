@@ -1,5 +1,5 @@
-import MarkdownEditor from "./features/markdown-editor/MarkdownEditor";
 import { Lato } from "next/font/google";
+import MarkdownEditor from "./markdown-editor/MarkdownEditor";
 
 const lato = Lato({
   subsets: ["latin"],

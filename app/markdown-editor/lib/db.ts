@@ -15,7 +15,7 @@ type DocRow = {
 let dbPromise: Promise<IDBPDatabase> | null = null;
 
 function getDb() {
-  if (typeof window === "undefined") {
+    if (typeof window === "undefined") {
     return Promise.reject(new Error("IndexedDB only available in browser"));
   }
   if (!dbPromise) {

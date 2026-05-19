@@ -1,7 +1,7 @@
 "use client";
 
 import { forwardRef, type Ref } from "react";
-import type { SaveStatus } from "../../../hooks/useMarkdownDoc";
+import type { SaveStatus } from "../hooks/useMarkdownDoc";
 import dynamic from "next/dynamic";
 
 type EditorPaneProps = {

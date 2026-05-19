@@ -11,20 +11,19 @@
   border: none;
 }
 .md-demo .toastui-editor-dark{
-  height: 100vh !important;   /* replaces the invalid min-height:100%dvh */
+  background: red !important;
+  /* height: 100vh ;   replaces the invalid min-height:100%dvh */
 }
 .md-demo .toastui-editor-md-container,
 .md-demo .toastui-editor-md-container .toastui-editor {
-  width: 100% !important;
-  max-width: none !important;
+  /* width: 100% !important; */
 
 }
 
 .md-demo .toastui-editor-md-container .ProseMirror {
   /* Mirror the right preview panel so content starts at the same level */
   padding: 2px 30px 80px;
-  max-width: 750px;
-  margin: 0 auto;
+  /* margin: 0 auto; */
   font-size: 15px;
   line-height: 1.7;
   font-family: Lato, "Helvetica Neue", Helvetica, sans-serif;

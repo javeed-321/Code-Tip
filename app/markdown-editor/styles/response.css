@@ -8,12 +8,13 @@
   }
 
   .md-demo .split {
-    flex-direction: column;
+    flex-direction: row;
+    justify-content: space-between;
     gap: 8px;
   }
 
   .md-demo .pane {
-    flex: 1;
+    /* flex: 2; */
     min-height: 250px;
   }
 

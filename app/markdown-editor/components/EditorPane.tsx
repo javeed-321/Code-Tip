@@ -31,7 +31,7 @@ const EditorPane = forwardRef<HTMLDivElement, EditorPaneProps>(function EditorPa
       <div className="label">Source</div>
       <div
         className="editor-box editor-box-left"
-        style={{ background: darkMode ? "#121212" : "#f8f8fc" }}
+        style={{ background: darkMode ? "#050505" : "#f8f8fc" }}
       >
         <ToastEditor
           ref={tuiRef}

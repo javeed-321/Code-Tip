@@ -1,26 +1,4 @@
 
-/*============================================================================ 
-   Toast UI Editor (left) + Tiptap preview (right), split layout
-
-   DOM:
-     .md-demo
-     └── .split
-         ├── .pane (left)
-         │   ├── .editor-box        ← wraps <Editor />
-         │   └── .status-bar
-         └── .pane (right)
-             ├── .editor-box.tiptap-output
-             └── .status-bar
-
-   SCROLL MODEL:
-     html, body                        → overflow: hidden  (no page scrollbar)
-     .md-demo                          → height: 100dvh    (anchors chain)
-     .split / .pane / .editor-box      → flex:1 + min-height:0 + overflow:hidden
-     .toastui-editor-md-container      → LEFT scrollbar
-     .tiptap-output                    → RIGHT scrollbar
-   ============================================================================ */
-
-
 /* ---------- 0. Page lock ---------- */
 html, body {
   height: 100%;
@@ -34,7 +12,7 @@ html, body {
   display: flex;
   flex-direction: column;
   height: 100dvh;
-  box-sizing:border-box;
+  /* box-sizing:border-box; */
   padding: 0;
   overflow: hidden;
   font-family: var(--font-lato), Lato, "Helvetica Neue", Helvetica, sans-serif;
@@ -69,7 +47,6 @@ html, body {
 
 .md-demo .editor-box-left {
   padding: 0;
-  background: red;
   border-right: 1px solid #e5e7eb;
 }
 

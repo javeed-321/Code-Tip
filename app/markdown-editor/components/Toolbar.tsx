@@ -3,6 +3,7 @@
 import { ReactNode } from "react";
 import {
   Bold, Italic,Strikethrough,  Heading1,  Heading2,  Minus,  Quote,  List,  ListOrdered,  ListChecks,  Code,  Braces,  Link,  Image,  Table,  FileCode,  FileText,  Sun,  Moon,
+  Eye,
 } from "lucide-react";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -14,6 +15,7 @@ type ToolbarProps = {
   onToggleTheme: () => void;
   onExportHtml: () => void;
   onExportPdf: () => void;
+  handleRightPane: () => void;
 };
 
 export default function Toolbar({
@@ -22,6 +24,7 @@ export default function Toolbar({
   onToggleTheme,
   onExportHtml,
   onExportPdf,
+  handleRightPane,
 }: ToolbarProps) {
   // The uniform formatting buttons. Add or remove one by editing this array.
   const buttons: { title: string; onClick: () => void; icon: ReactNode }[] = [
@@ -69,6 +72,9 @@ export default function Toolbar({
         onClick={onToggleTheme}
       >
         {darkMode ? <Sun size={18} /> : <Moon size={18} />}
+      </button>
+      <button onClick={handleRightPane} aria-label="Toggle right pane">
+        <Eye size={18} />
       </button>
     </div>
   );

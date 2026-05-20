@@ -12,7 +12,6 @@ html, body {
   display: flex;
   flex-direction: column;
   height: 100dvh;
-  /* box-sizing:border-box; */
   padding: 0;
   overflow: hidden;
   font-family: var(--font-lato), Lato, "Helvetica Neue", Helvetica, sans-serif;
@@ -81,7 +80,7 @@ html, body {
 
 /* --- Dark mode --- */
 .md-demo .pane-dark .editor-box-left {
-  border-right-color: #2d2d2d;
+  border-right-color:#121212;
 }
 
 .md-demo .pane-dark .toastui-editor-md-container .ProseMirror {

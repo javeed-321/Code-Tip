@@ -1,37 +1,99 @@
-/* ---------- 8. Mobile ---------- */
+/* =============================================================
+   Mobile layout (≤ 768px)
+   - The two-pane split is replaced with a single-pane view.
+   - The Tiptap preview is hidden; the editor takes the full width.
+   - Toolbar scrolls horizontally if it overflows.
+   ============================================================= */
+
 @media (max-width: 768px) {
+  /* Root — no extra top padding because the toolbar is now in-flow */
   .md-demo {
     height: 100dvh;
-    padding: 8px;
-    padding-top: 57px;
-    gap: 8px;
+    padding: 0;
+    gap: 0;
   }
 
+  /* Split: stack vertically and let the (visible) pane take all the space */
   .md-demo .split {
-    flex-direction: row;
-    justify-content: space-between;
-    gap: 8px;
+    flex-direction: column;
+    gap: 0;
   }
 
-  .md-demo .pane {
-    /* flex: 2; */
-    min-height: 250px;
+  /* Editor pane — fills the screen below the toolbar */
+  .md-demo .split > .pane:first-child {
+    flex: 1 1 auto;
+    min-height: 0;
   }
 
-  .tiptap-output iframe,
-  .tiptap-output img {
-    max-width: 100%;
-    height: auto;
+  /* Preview pane — hidden on mobile.
+     If you ever want to swap, flip these two rules. */
+  .md-demo .split > .pane:first-child {
+    display: none;
   }
 
-  .md-demo .toastui-editor-defaultUI-toolbar {
+  /* Editor box: full width, comfortable padding */
+  .md-demo .editor-box-left {
+    border-right: none;
+    padding: 0;
+  }
+
+  /* Toolbar: keep it horizontally scrollable so overflow buttons stay reachable.
+     Buttons get a touch larger for thumbs. */
+  .md-demo .my-toolbar {
     overflow-x: auto;
     overflow-y: hidden;
     flex-wrap: nowrap;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    padding: 6px 8px;
+    height: 44px;
+  }
+  .md-demo .my-toolbar::-webkit-scrollbar {
+    display: none;
+  }
+  .md-demo .my-toolbar button {
+    flex: 0 0 auto;
+    width: 36px;
+    height: 32px;
+  }
+  /* The spacer should also stay inert during horizontal scroll */
+  .md-demo .my-toolbar__spacer {
+    flex: 0 0 8px;
+  }
+
+  /* Status bar: compact, single line, tighter spacing */
+  .md-demo .status-bar {
+    font-size: 11px;
+    padding: 6px 10px;
+    gap: 8px;
+    overflow-x: auto;
+    white-space: nowrap;
+    scrollbar-width: none;
+  }
+  .md-demo .status-bar::-webkit-scrollbar { display: none; }
+
+  /* Toast UI editor inner padding — give content breathing room */
+  .md-demo .toastui-editor-md-container .ProseMirror {
+    padding: 16px 18px 100px;
+    max-width: none;
+    font-size: 16px;          /* iOS won't zoom on focus when ≥ 16px */
+    line-height: 1.6;
+  }
+
+  /* Media inside the editor never overflows the viewport */
+  .toastui-editor iframe,
+  .toastui-editor img {
+    max-width: 100%;
+    height: auto;
   }
 }
 
-/* Force Toast UI's markdown content into normal flow so it overflows */
+/* =============================================================
+   Toast UI internal flow fixes (apply at all sizes).
+   These force Toast UI's nested containers to grow naturally
+   so our outer wrapper controls the scroll.
+   ============================================================= */
+
 .md-demo .toastui-editor-md-container .toastui-editor {
   position: static !important;
   height: auto !important;
@@ -40,17 +102,8 @@
 
 .md-demo .toastui-editor-md-container .ProseMirror {
   min-height: 100% !important;
-    -webkit-spellcheck: false;
-
 }
 
-/* LEFT scroller — the wrapper, not Toast UI's internal element */
-/* .md-demo .editor-box-left {
-  overflow-y: scroll;
-  overflow-x: hidden;
-} */
-
-/* Let Toast UI's content grow naturally instead of locking to 100% */
 .md-demo .toastui-editor-md-container {
   height: auto !important;
   overflow: visible !important;

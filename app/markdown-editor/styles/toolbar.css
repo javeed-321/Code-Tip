@@ -5,12 +5,7 @@
   overflow: auto !important;
 }
 
-.md-demo .tiptap-output {
-  height: 100% !important;
-  overflow-y: auto;
-  overflow-x: auto;
-  background: #f3f3f3;   /* StackEdit $preview-background-light */
-}
+
 
 
 /* ---------- 4. Toast UI's built-in toolbar — hidden; we render our own ---------- */
@@ -148,3 +143,5 @@
   box-shadow: 0 0 0 1px rgba(96, 165, 250, 0.45),
               0 0 10px rgba(96, 165, 250, 0.35);
 }
+
+.my-toolbar__pane-toggle[aria-pressed="true"] { background: #60a5fa; }

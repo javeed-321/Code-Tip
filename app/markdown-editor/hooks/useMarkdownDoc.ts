@@ -33,6 +33,7 @@ export function useMarkdownDoc(fallback: string) {
       } catch (err) {
         console.error("Failed to load doc:", err);
         setText(fallback);
+        throw err;
       } finally {
         setHydrated(true);
       }

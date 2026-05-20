@@ -10,10 +10,7 @@
 .md-demo .toastui-editor-main {
   border: none;
 }
-.md-demo .toastui-editor-dark{
-  background: red !important;
-  /* height: 100vh ;   replaces the invalid min-height:100%dvh */
-}
+
 .md-demo .toastui-editor-md-container,
 .md-demo .toastui-editor-md-container .toastui-editor {
   /* width: 100% !important; */

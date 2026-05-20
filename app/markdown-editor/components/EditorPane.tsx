@@ -14,6 +14,7 @@ type EditorPaneProps = {
   stats: { bytes: number; words: number; lines: number };
   cursor: { line: number; col: number };
   saveStatus: SaveStatus;
+  showRight: boolean;
 };
 
 const ToastEditor = dynamic(
@@ -23,15 +24,14 @@ const ToastEditor = dynamic(
 
 // Left side of the split: Toast UI markdown editor + its status bar.
 const EditorPane = forwardRef<HTMLDivElement, EditorPaneProps>(function EditorPane(
-  { tuiRef, text, darkMode, onChange, onLoad, stats, cursor, saveStatus },
+  { tuiRef, text, darkMode, onChange, onLoad, stats, cursor, saveStatus, showRight },
   ref
 ) {
   return (
     <div ref={ref} className={`pane ${darkMode ? "pane-dark" : ""}`}>
-      <div className="label">Source</div>
       <div
-        className="editor-box editor-box-left"
-        style={{ background: darkMode ? "#050505" : "#f8f8fc" }}
+        className={`editor-box editor-box-left ${showRight ? "with-margin" : ""}`}
+        style={{ background: darkMode ? "#121212" : "#fff" ,    paddingLeft: !showRight ? "250px" : "0",}}
       >
         <ToastEditor
           ref={tuiRef}

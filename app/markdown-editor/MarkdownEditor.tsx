@@ -14,7 +14,7 @@ import "./styles/tiptap.css";
 import "./styles/toast.css";
 import "./styles/status-bar.css";
 
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useMemo } from "react";
 
 // App-wide
 import { exportHtml, exportPdf } from "./lib/export";
@@ -30,16 +30,18 @@ import { getMarkdownStats } from "./lib/markdown-stats";
 import { makeExec } from "./lib/toastui-commands";
 import { usePreviewEditor } from "./hooks/usePreviewEditor";
 import { useToastUICursor } from "./hooks/useToastUICursor";
-import { useDisableSpellcheck } from "./hooks/useDisableSpellcheck";
+// import { useDisableSpellcheck } from "./hooks/useDisableSpellcheck";
 import { usePreviewStats } from "./hooks/usePreviewStats";
 import { useTiptapMirror } from "./hooks/useTiptapMirror";
 
-function useToastUITheme(darkMode: boolean, ready: boolean) {
+// function useToastUITheme(darkMode: boolean, ready: boolean) {
   
-}
+// }
 
 export default function MarkdownEditor() {
-  // Document state (load + autosave handled by the hook)
+
+  const[showRight,setShowRight]=useState(true);
+  // / Document state (load + autosave handled by the hook)
   const { text, setText, hydrated, saveStatus } = useMarkdownDoc(mdContent);
 
   // UI state
@@ -55,16 +57,22 @@ export default function MarkdownEditor() {
   const cursor = useToastUICursor(tuiRef, tuiReady);
   const editor = usePreviewEditor();
   const previewStats = usePreviewStats(editor);
-  const mdStats = getMarkdownStats(text);
+  const mdStats = useMemo(() => getMarkdownStats(text), [text]);
+
+
+  const handleRightPane=()=>{
+    setShowRight((p)=>!p);
+
+  }
+
 
   // Side effects
   useTiptapMirror(editor, text);
-  useToastUITheme(darkMode, tuiReady);
+  // useToastUITheme(darkMode, tuiReady);
   // useDisableSpellcheck(text);
-  useScrollSync(leftPaneRef, rightBoxRef, ".editor-box-left", hydrated);
+  useScrollSync(leftPaneRef, rightBoxRef, ".editor-box-left", hydrated && showRight);
 
-  useEffect(() => {
-  }, [darkMode, tuiReady]);
+
 
 
   // Pull markdown out of Toast UI on every change
@@ -81,7 +89,7 @@ export default function MarkdownEditor() {
   }
 
   const toggleTheme = () =>{
-    console.log("Toggling theme, darkMode is now:", !darkMode);
+    // console.log("Toggling theme, darkMode is now:", !darkMode);
     const root = document.querySelector(".toastui-editor-defaultUI");
     if (root) root.classList.toggle("toastui-editor-dark", !darkMode);
         setDarkMode((p) => !p);
@@ -103,6 +111,7 @@ export default function MarkdownEditor() {
         onExportPdf={() =>
           editor && exportPdf({ html: editor.getHTML(), title: "document" })
         }
+        handleRightPane={handleRightPane}
       />
       <div className="split">
         <EditorPane
@@ -115,13 +124,16 @@ export default function MarkdownEditor() {
           stats={mdStats}
           cursor={cursor}
           saveStatus={saveStatus}
+          showRight={showRight}
         />
-        <PreviewPane
+       {
+        showRight && ( <PreviewPane
           ref={rightBoxRef}
           editor={editor}
           darkMode={darkMode}
           stats={previewStats}
-        />
+        />)
+       }
       </div>
     </div>
   );

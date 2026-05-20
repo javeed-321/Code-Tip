@@ -22,6 +22,13 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
+.md-demo .tiptap-output {
+  height: 100% !important;
+  overflow-y: auto;
+  overflow-x: auto;
+  background: #f3f3f3;   /* StackEdit $preview-background-light */
+}
+
 /* Collapse first-child top margin so content sits flush at top */
 .tiptap-output .ProseMirror > *:first-child { margin-top: 0; }
 
